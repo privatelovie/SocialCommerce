@@ -39,6 +39,8 @@ import EnhancedProfile from './components/EnhancedProfile';
 import AnalyticsDashboard from './components/AnalyticsDashboard';
 import CreatePost from './components/CreatePost';
 import Settings from './components/Settings';
+import ProductPage from './components/ProductPage';
+import UserSearch from './components/UserSearch';
 
 // Pages
 import ExplorePage from './pages/ExplorePage';
@@ -338,10 +340,24 @@ const AppContent: React.FC = () => {
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [wishlistItems, setWishlistItems] = useState<any[]>([]);
   const [showSettings, setShowSettings] = useState(false);
+  const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
+  const [showProductPage, setShowProductPage] = useState(false);
+  const [showUserSearch, setShowUserSearch] = useState(false);
 
   // Handle navigation
   const handleNavigate = (path: string) => {
-    setCurrentView(path.replace('/', '') || 'feed');
+    if (path === '/people' || path === 'people') {
+      setShowUserSearch(true);
+      setCurrentView('people');
+    } else {
+      setCurrentView(path.replace('/', '') || 'feed');
+    }
+  };
+
+  // Handle product page navigation
+  const handleProductClick = (productId: string) => {
+    setSelectedProductId(productId);
+    setShowProductPage(true);
   };
 
   // Handle search
@@ -490,6 +506,7 @@ const AppContent: React.FC = () => {
         notificationsCount={0}
         onCartOpen={toggleCart}
         onNotificationsOpen={() => setSnackbarMessage('Notifications opened!')}
+        onProductClick={(product) => handleProductClick(product.id)}
       />
 
       <Container maxWidth="lg" sx={{ pt: 10, pb: 4 }}>
@@ -521,7 +538,7 @@ const AppContent: React.FC = () => {
                       onBookmark={() => {}}
                       onFollow={() => {}}
                       onAddToCart={handleAddToCart}
-                      onProductClick={() => {}}
+                      onProductClick={() => post.product && handleProductClick(post.product.id)}
                       onWishlist={handleToggleWishlist}
                       onToggleComments={() => handlePostClick(post)}
                       wishlistItems={wishlistItems}
@@ -544,11 +561,11 @@ const AppContent: React.FC = () => {
               transition={{ duration: 0.3 }}
             >
               <ExplorePage
-                onProductClick={() => {}}
-                onWishlist={() => {}}
+                onProductClick={(product) => handleProductClick(product.id)}
+                onWishlist={handleToggleWishlist}
                 onCompare={() => {}}
                 onShare={() => {}}
-                wishlistItems={[]}
+                wishlistItems={wishlistItems}
                 compareItems={[]}
               />
             </motion.div>
@@ -564,7 +581,7 @@ const AppContent: React.FC = () => {
               transition={{ duration: 0.3 }}
             >
               <VideoPromotion
-                onProductClick={() => {}}
+                onProductClick={(product) => handleProductClick(product.id)}
                 onCreateVideo={() => {}}
               />
             </motion.div>
@@ -603,9 +620,9 @@ const AppContent: React.FC = () => {
             >
               <EnhancedProfile
                 isOwnProfile={true}
-                onProductClick={() => {}}
+                onProductClick={(product) => handleProductClick(product.id)}
                 onPostClick={handlePostClick}
-                onFollowToggle={() => {}}
+                onFollowToggle={() => {}
               />
             </motion.div>
           )}
@@ -633,6 +650,39 @@ const AppContent: React.FC = () => {
               transition={{ duration: 0.3 }}
             >
               <Settings onClose={() => setCurrentView('feed')} />
+            </motion.div>
+          )}
+
+          {/* Trending View */}
+          {currentView === 'trending' && (
+            <motion.div
+              key="trending"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+            >
+              <ExplorePage
+                onProductClick={(product) => handleProductClick(product.id)}
+                onWishlist={handleToggleWishlist}
+                onCompare={() => {}}
+                onShare={() => {}}
+                wishlistItems={wishlistItems}
+                compareItems={[]}
+              />
+            </motion.div>
+          )}
+
+          {/* User Search View */}
+          {currentView === 'people' && (
+            <motion.div
+              key="people"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+            >
+              <UserSearch onClose={() => setCurrentView('feed')} />
             </motion.div>
           )}
 
@@ -686,6 +736,28 @@ const AppContent: React.FC = () => {
           {snackbarMessage}
         </Alert>
       </Snackbar>
+
+      {/* Product Page Dialog */}
+      <Dialog
+        open={showProductPage}
+        onClose={() => setShowProductPage(false)}
+        maxWidth="lg"
+        fullWidth
+        PaperProps={{
+          sx: {
+            maxHeight: '95vh',
+            borderRadius: 3,
+            overflow: 'hidden'
+          }
+        }}
+      >
+        {selectedProductId && (
+          <ProductPage
+            productId={selectedProductId}
+            onClose={() => setShowProductPage(false)}
+          />
+        )}
+      </Dialog>
     </Box>
   );
 };
