@@ -1,6 +1,5 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "name": "social-commerce-ai-platform",
   "version": 2,
   "buildCommand": "npm run build",
   "outputDirectory": "build",
@@ -27,7 +26,7 @@
       ]
     },
     {
-      "source": "/(.*\\.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot))$",
+      "source": "/static/(.*)",
       "headers": [
         {
           "key": "Cache-Control",
@@ -36,11 +35,11 @@
       ]
     },
     {
-      "source": "/(.*)\\.(html|json|xml)$",
+      "source": "/(.*)",
       "headers": [
         {
           "key": "Cache-Control",
-          "value": "public, max-age=0, must-revalidate"
+          "value": "public, max-age=3600, s-maxage=31536000"
         }
       ]
     }
@@ -51,11 +50,6 @@
     "CI": "false",
     "GENERATE_SOURCEMAP": "false",
     "ESLINT_NO_DEV_ERRORS": "true"
-  },
-  "functions": {
-    "app/api/**/*.js": {
-      "runtime": "nodejs18.x"
-    }
   },
   "regions": ["iad1"],
   "github": {
