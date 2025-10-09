@@ -463,65 +463,6 @@ export class DemoRealProductService {
     ];
   }
 
-  async getProductReviews(productId: string): Promise<ProductReview[]> {
-    // Generate realistic reviews for products
-    const reviewTemplates = [
-      {
-        rating: 5,
-        title: 'Excellent product!',
-        comment: 'This product exceeded my expectations. Great build quality and works perfectly.',
-        name: 'Sarah Johnson'
-      },
-      {
-        rating: 4,
-        title: 'Good value for money',
-        comment: 'Solid product with good features. Delivery was fast and packaging was secure.',
-        name: 'Mike Chen'
-      },
-      {
-        rating: 5,
-        title: 'Highly recommend!',
-        comment: 'Amazing quality and great customer service. Will definitely buy again.',
-        name: 'Emily Davis'
-      },
-      {
-        rating: 3,
-        title: 'Decent but could be better',
-        comment: 'Product is okay but has some minor issues. Customer support was helpful.',
-        name: 'John Smith'
-      },
-      {
-        rating: 4,
-        title: 'Great purchase',
-        comment: 'Very satisfied with this purchase. Good quality and reasonable price.',
-        name: 'Anna Rodriguez'
-      }
-    ];
-
-    const numReviews = Math.floor(Math.random() * 4) + 2; // 2-5 reviews
-    const selectedReviews = reviewTemplates
-      .sort(() => 0.5 - Math.random())
-      .slice(0, numReviews);
-
-    return selectedReviews.map((template, index) => ({
-      id: `${productId}_review_${index}`,
-      productId,
-      user: {
-        name: template.name,
-        avatar: `https://images.unsplash.com/photo-${1494790108755 + index}?w=50`,
-        verified: Math.random() > 0.3 // 70% chance of being verified
-      },
-      rating: template.rating,
-      title: template.title,
-      comment: template.comment,
-      date: new Date(Date.now() - Math.random() * 90 * 24 * 60 * 60 * 1000).toISOString(),
-      helpful: Math.floor(Math.random() * 50),
-      verified: Math.random() > 0.2, // 80% chance of verified purchase
-      source: 'demo_reviews'
-    }));
-  }
-}
-
 // Price tracking service
 export class PriceTrackingService {
   private priceHistory: Map<string, Array<{ price: number; date: string }>> = new Map();
