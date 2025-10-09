@@ -10,7 +10,7 @@ import {
   Button,
   IconButton,
   Avatar,
-  Grid,
+  Grid2 as Grid,
   Tab,
   Tabs,
   Badge,
@@ -27,7 +27,7 @@ import {
 } from '@mui/material';
 import {
   Search as SearchIcon,
-  Trending as TrendingIcon,
+  TrendingUp as TrendingIcon,
   LocalOffer as TagIcon,
   Favorite as LikeIcon,
   Comment as CommentIcon,
@@ -35,7 +35,7 @@ import {
   Close as CloseIcon,
   TrendingUp,
   Category,
-  WhatsHot
+  Whatshot as WhatsHot
 } from '@mui/icons-material';
 import { motion, AnimatePresence } from 'framer-motion';
 import hashtagService, { Hashtag, HashtagPost } from '../services/hashtagService';
@@ -273,7 +273,7 @@ const HashtagExplorer: React.FC<HashtagExplorerProps> = ({ onClose, onHashtagCli
   const renderTrendingTab = () => (
     <Box>
       <Typography variant="h5" fontWeight={700} sx={{ mb: 3, display: 'flex', alignItems: 'center', gap: 1 }}>
-        <TrendingUpIcon color="primary" />
+        <TrendingUp color="primary" />
         Trending Hashtags
       </Typography>
       

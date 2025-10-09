@@ -641,6 +641,7 @@ const AppContent: React.FC = () => {
                 onProductClick={(product) => handleProductClick(product.id)}
                 onPostClick={handlePostClick}
                 onFollowToggle={() => {}}
+                onEditProfile={() => handleNavigate('edit-profile')}
               />
             </motion.div>
           )}

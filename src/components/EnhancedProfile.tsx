@@ -90,6 +90,7 @@ interface EnhancedProfileProps {
   onProductClick?: (product: Product) => void;
   onPostClick?: (post: Post) => void;
   onFollowToggle?: (userId: string, isFollowing: boolean) => void;
+  onEditProfile?: () => void;
 }
 
 const EnhancedProfile: React.FC<EnhancedProfileProps> = ({
@@ -97,7 +98,8 @@ const EnhancedProfile: React.FC<EnhancedProfileProps> = ({
   isOwnProfile = true,
   onProductClick,
   onPostClick,
-  onFollowToggle
+  onFollowToggle,
+  onEditProfile
 }) => {
   const { user } = useAuth();
   const { followUser, unfollowUser, following } = useSocial();
@@ -409,7 +411,7 @@ const EnhancedProfile: React.FC<EnhancedProfileProps> = ({
                 <Button
                   variant="outlined"
                   startIcon={<Edit />}
-                  onClick={() => setShowAnalytics(true)}
+                  onClick={() => onEditProfile?.()}
                 >
                   Edit Profile
                 </Button>

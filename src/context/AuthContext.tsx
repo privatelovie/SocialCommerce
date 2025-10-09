@@ -18,6 +18,26 @@ export interface User {
   website?: string;
   isCreator: boolean;
   creatorLevel: 'bronze' | 'silver' | 'gold' | 'platinum';
+  
+  // Extended profile fields
+  dateOfBirth?: string;
+  occupation?: string;
+  education?: string;
+  coverPhoto?: string;
+  socialLinks?: Array<{
+    platform: string;
+    url: string;
+    icon?: React.ReactNode;
+  }>;
+  interests?: string[];
+  isPrivate?: boolean;
+  showEmail?: boolean;
+  showLocation?: boolean;
+  allowMessages?: boolean;
+  emailNotifications?: boolean;
+  pushNotifications?: boolean;
+  theme?: 'light' | 'dark' | 'auto';
+  language?: string;
 }
 
 interface AuthContextType {
@@ -95,7 +115,23 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         location: 'New York, USA',
         website: 'https://johndoe.com',
         isCreator: true,
-        creatorLevel: 'gold'
+        creatorLevel: 'gold',
+        
+        // Extended profile fields with defaults
+        dateOfBirth: '1990-05-15',
+        occupation: 'Content Creator',
+        education: 'Computer Science, NYU',
+        coverPhoto: '',
+        socialLinks: [],
+        interests: ['Technology', 'Photography', 'Travel'],
+        isPrivate: false,
+        showEmail: false,
+        showLocation: true,
+        allowMessages: true,
+        emailNotifications: true,
+        pushNotifications: true,
+        theme: 'light',
+        language: 'en'
       };
 
       setUser(mockUser);

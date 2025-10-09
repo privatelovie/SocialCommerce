@@ -194,7 +194,7 @@ export class HashtagService {
   extractHashtags(text: string): string[] {
     const hashtagRegex = /#[a-zA-Z0-9_]+/g;
     const matches = text.match(hashtagRegex);
-    return matches ? [...new Set(matches.map(tag => tag.toLowerCase()))] : [];
+    return matches ? Array.from(new Set(matches.map(tag => tag.toLowerCase()))) : [];
   }
 
   // Search hashtags
@@ -202,13 +202,13 @@ export class HashtagService {
     const normalizedQuery = query.toLowerCase().replace('#', '');
     
     const results: Hashtag[] = [];
-    for (const [name, hashtag] of this.hashtags) {
+    Array.from(this.hashtags.entries()).forEach(([name, hashtag]) => {
       if (name.includes(normalizedQuery) || 
           hashtag.description?.toLowerCase().includes(normalizedQuery) ||
           hashtag.category?.toLowerCase().includes(normalizedQuery)) {
         results.push(hashtag);
       }
-    }
+    });
 
     // Sort by relevance (exact matches first, then by count)
     results.sort((a, b) => {

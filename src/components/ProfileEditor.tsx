@@ -9,7 +9,7 @@ import {
   Avatar,
   Card,
   CardContent,
-  Grid,
+  Grid2 as Grid,
   Switch,
   FormControlLabel,
   Select,
