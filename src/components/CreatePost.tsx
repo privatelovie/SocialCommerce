@@ -46,6 +46,7 @@ import { useAuth } from '../context/AuthContext';
 import { useSocial } from '../context/SocialContext';
 import demoProductService from '../services/demoRealProducts';
 import { RealProduct } from '../services/productApi';
+import hashtagService from '../services/hashtagService';
 
 interface CreatePostProps {
   onPostCreated?: (post: any) => void;
@@ -77,7 +78,7 @@ const CreatePost: React.FC<CreatePostProps> = ({ onPostCreated, onClose }) => {
   const commonEmojis = ['😀', '😂', '🥰', '😍', '🤔', '😎', '🔥', '💯', '❤️', '👍', '🎉', '✨'];
 
   // Extract hashtags from content
-  const detectedHashtags = extractHashtags(content);
+  const detectedHashtags = hashtagService.extractHashtags(content);
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || []);
@@ -163,6 +164,26 @@ const CreatePost: React.FC<CreatePostProps> = ({ onPostCreated, onClose }) => {
         privacy,
         scheduledDate: scheduledDate || null
       };
+
+      // Register hashtags with service
+      for (const hashtag of detectedHashtags) {
+        await hashtagService.addHashtag(hashtag, {
+          id: newPost.id,
+          hashtags: detectedHashtags,
+          content: newPost.content,
+          author: {
+            id: newPost.user.id,
+            name: newPost.user.displayName,
+            avatar: newPost.user.avatar
+          },
+          createdAt: new Date().toISOString(),
+          engagement: {
+            likes: 0,
+            comments: 0,
+            shares: 0
+          }
+        });
+      }
 
       // Call parent callback
       if (onPostCreated) {

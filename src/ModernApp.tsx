@@ -41,6 +41,8 @@ import CreatePost from './components/CreatePost';
 import Settings from './components/Settings';
 import ProductPage from './components/ProductPage';
 import UserSearch from './components/UserSearch';
+import HashtagExplorer from './components/HashtagExplorer';
+import ProfileEditor from './components/ProfileEditor';
 
 // Pages
 import ExplorePage from './pages/ExplorePage';
@@ -343,12 +345,20 @@ const AppContent: React.FC = () => {
   const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
   const [showProductPage, setShowProductPage] = useState(false);
   const [showUserSearch, setShowUserSearch] = useState(false);
+  const [showHashtagExplorer, setShowHashtagExplorer] = useState(false);
+  const [showProfileEditor, setShowProfileEditor] = useState(false);
 
   // Handle navigation
   const handleNavigate = (path: string) => {
     if (path === '/people' || path === 'people') {
       setShowUserSearch(true);
       setCurrentView('people');
+    } else if (path === '/hashtags' || path === 'hashtags') {
+      setShowHashtagExplorer(true);
+      setCurrentView('hashtags');
+    } else if (path === '/edit-profile' || path === 'edit-profile') {
+      setShowProfileEditor(true);
+      setCurrentView('edit-profile');
     } else {
       setCurrentView(path.replace('/', '') || 'feed');
     }
@@ -358,6 +368,14 @@ const AppContent: React.FC = () => {
   const handleProductClick = (productId: string) => {
     setSelectedProductId(productId);
     setShowProductPage(true);
+  };
+
+  // Handle hashtag click
+  const handleHashtagClick = (hashtag: string) => {
+    // You could implement hashtag filtering in the feed or navigate to hashtag explorer
+    setShowHashtagExplorer(true);
+    setCurrentView('hashtags');
+    setSnackbarMessage(`Exploring ${hashtag} posts`);
   };
 
   // Handle search
@@ -683,6 +701,42 @@ const AppContent: React.FC = () => {
               transition={{ duration: 0.3 }}
             >
               <UserSearch onClose={() => setCurrentView('feed')} />
+            </motion.div>
+          )}
+
+          {/* Hashtag Explorer View */}
+          {currentView === 'hashtags' && (
+            <motion.div
+              key="hashtags"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+            >
+              <HashtagExplorer
+                onClose={() => setCurrentView('feed')}
+                onHashtagClick={handleHashtagClick}
+              />
+            </motion.div>
+          )}
+
+          {/* Profile Editor View */}
+          {currentView === 'edit-profile' && (
+            <motion.div
+              key="edit-profile"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+            >
+              <ProfileEditor
+                onClose={() => setCurrentView('feed')}
+                onSave={(profileData) => {
+                  console.log('Profile saved:', profileData);
+                  setSnackbarMessage('Profile updated successfully!');
+                  setCurrentView('profile');
+                }}
+              />
             </motion.div>
           )}
 
