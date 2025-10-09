@@ -10,7 +10,7 @@ import {
   Button,
   IconButton,
   Avatar,
-  Grid2 as Grid,
+  Grid,
   Tab,
   Tabs,
   Badge,

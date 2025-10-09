@@ -27,7 +27,7 @@ export interface User {
   socialLinks?: Array<{
     platform: string;
     url: string;
-    icon?: React.ReactNode;
+    icon: React.ReactNode;
   }>;
   interests?: string[];
   isPrivate?: boolean;
