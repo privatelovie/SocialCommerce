@@ -84,7 +84,7 @@ interface SettingsProps {
 }
 
 const Settings: React.FC<SettingsProps> = ({ onClose }) => {
-  const { user, updateUser } = useAuth();
+  const { user, updateProfile } = useAuth();
   const { addNotification } = useSocial();
   
   const [currentTab, setCurrentTab] = useState(0);
@@ -173,7 +173,7 @@ const Settings: React.FC<SettingsProps> = ({ onClose }) => {
 
   const handleSaveProfile = async () => {
     try {
-      await updateUser({
+      await updateProfile({
         username: settings.username,
         displayName: settings.displayName,
         bio: settings.bio,

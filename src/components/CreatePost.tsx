@@ -283,7 +283,7 @@ const CreatePost: React.FC<CreatePostProps> = ({ onPostCreated, onClose }) => {
             <Box mb={2}>
               <Grid container spacing={1}>
                 {selectedImages.map((image, index) => (
-                  <Grid item xs={6} sm={3} key={index}>
+                  <Grid xs={6} sm={3} key={index}>
                     <Box position="relative">
                       <img
                         src={URL.createObjectURL(image)}
@@ -607,7 +607,7 @@ const CreatePost: React.FC<CreatePostProps> = ({ onPostCreated, onClose }) => {
 
           <Grid container spacing={2}>
             {searchedProducts.map((product) => (
-              <Grid item xs={12} sm={6} md={4} key={product.id}>
+              <Grid xs={12} sm={6} md={4} key={product.id}>
                 <Card
                   variant="outlined"
                   onClick={() => handleProductSelect(product)}
@@ -656,7 +656,7 @@ const CreatePost: React.FC<CreatePostProps> = ({ onPostCreated, onClose }) => {
         <DialogContent>
           <Grid container spacing={1}>
             {commonEmojis.map((emoji) => (
-              <Grid item xs={3} key={emoji}>
+              <Grid xs={3} key={emoji}>
                 <Button
                   onClick={() => addEmoji(emoji)}
                   sx={{
