@@ -27,6 +27,156 @@ export class DemoRealProductService {
     this.openProductService = new OpenProductService();
   }
 
+  async getProductById(id: string): Promise<RealProduct | null> {
+    const cacheKey = `product_${id}`;
+    
+    // Check cache first
+    if (this.cache.has(cacheKey)) {
+      const cached = this.cache.get(cacheKey)!;
+      if (Date.now() - cached.timestamp < this.cacheTimeout) {
+        return cached.data;
+      }
+    }
+
+    try {
+      // Try to extract the original ID and source from our prefixed ID
+      let originalId = id;
+      let source = 'unknown';
+      
+      if (id.startsWith('fakestore_')) {
+        originalId = id.replace('fakestore_', '');
+        source = 'fakestore';
+      } else if (id.startsWith('dummyjson_')) {
+        originalId = id.replace('dummyjson_', '');
+        source = 'dummyjson';
+      } else if (id.startsWith('tech_')) {
+        source = 'tech';
+      }
+
+      let product: RealProduct | null = null;
+
+      if (source === 'fakestore') {
+        const response = await fetch(`https://fakestoreapi.com/products/${originalId}`);
+        const fakeProduct: FakeStoreProduct = await response.json();
+        
+        product = {
+          id: `fakestore_${fakeProduct.id}`,
+          name: fakeProduct.title,
+          brand: this.getBrandFromCategory(fakeProduct.category),
+          price: fakeProduct.price,
+          currency: 'USD',
+          image: fakeProduct.image,
+          images: [fakeProduct.image],
+          rating: fakeProduct.rating.rate,
+          reviewCount: fakeProduct.rating.count,
+          category: fakeProduct.category,
+          description: fakeProduct.description,
+          features: this.extractFeatures(fakeProduct.description),
+          availability: 'in_stock' as const,
+          url: `https://fakestoreapi.com/products/${fakeProduct.id}`,
+          source: 'demo' as any,
+          lastUpdated: new Date().toISOString()
+        };
+      } else if (source === 'dummyjson') {
+        const response = await fetch(`https://dummyjson.com/products/${originalId}`);
+        const dummyProduct = await response.json();
+        
+        product = {
+          id: `dummyjson_${dummyProduct.id}`,
+          name: dummyProduct.title,
+          brand: dummyProduct.brand || 'Generic',
+          price: dummyProduct.price,
+          originalPrice: dummyProduct.price * 1.2,
+          currency: 'USD',
+          image: dummyProduct.thumbnail,
+          images: dummyProduct.images || [dummyProduct.thumbnail],
+          rating: dummyProduct.rating || 4.5,
+          reviewCount: Math.floor(Math.random() * 500) + 50,
+          category: dummyProduct.category,
+          description: dummyProduct.description,
+          features: dummyProduct.tags || [],
+          specifications: {
+            'Discount': `${dummyProduct.discountPercentage}%`,
+            'Stock': dummyProduct.stock.toString(),
+            'Brand': dummyProduct.brand || 'Generic'
+          },
+          availability: dummyProduct.stock > 0 ? 'in_stock' as const : 'out_of_stock' as const,
+          url: `https://dummyjson.com/products/${dummyProduct.id}`,
+          source: 'demo' as any,
+          lastUpdated: new Date().toISOString()
+        };
+      } else {
+        // Search through all products to find the one with matching ID
+        const allProducts = await this.searchProducts('', { limit: 100 });
+        product = allProducts.find(p => p.id === id) || null;
+      }
+
+      // Cache the result
+      if (product) {
+        this.cache.set(cacheKey, { data: product, timestamp: Date.now() });
+      }
+      
+      return product;
+    } catch (error) {
+      console.error('Error fetching product by ID:', error);
+      return null;
+    }
+  }
+
+  async getProductReviews(productId: string): Promise<ProductReview[]> {
+    const cacheKey = `reviews_${productId}`;
+    
+    // Check cache first
+    if (this.cache.has(cacheKey)) {
+      const cached = this.cache.get(cacheKey)!;
+      if (Date.now() - cached.timestamp < this.cacheTimeout) {
+        return cached.data;
+      }
+    }
+
+    // Generate mock reviews for demonstration
+    const mockUsers = [
+      { id: '1', name: 'Sarah Johnson', avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=50', verified: true },
+      { id: '2', name: 'Mike Chen', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=50', verified: false },
+      { id: '3', name: 'Emily Davis', avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=50', verified: true },
+      { id: '4', name: 'Alex Rodriguez', avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=50', verified: false },
+      { id: '5', name: 'Jessica Kim', avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=50', verified: true }
+    ];
+
+    const mockReviews: ProductReview[] = mockUsers.map((user, index) => ({
+      id: `review_${productId}_${index}`,
+      productId: productId,
+      user: {
+        name: user.name,
+        avatar: user.avatar,
+        verified: user.verified
+      },
+      rating: Math.floor(Math.random() * 2) + 4, // 4-5 stars
+      title: [
+        'Great product!',
+        'Exceeded expectations',
+        'Worth every penny',
+        'Highly recommend',
+        'Amazing quality'
+      ][index] || 'Good purchase',
+      comment: [
+        'This product completely exceeded my expectations. The quality is outstanding and shipping was fast.',
+        'Really happy with this purchase. Great value for money and works exactly as described.',
+        'Excellent build quality and design. Would definitely buy again and recommend to others.',
+        'Fast shipping, great packaging, and the product works perfectly. Very satisfied!',
+        'Top-notch quality and customer service. This has become my go-to choice for this type of product.'
+      ][index] || 'Good product overall.',
+      date: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString(), // Random date within last 30 days
+      helpful: Math.floor(Math.random() * 20),
+      verified: Math.random() > 0.3, // 70% verified purchases
+      source: 'demo'
+    }));
+
+    // Cache the result
+    this.cache.set(cacheKey, { data: mockReviews, timestamp: Date.now() });
+    return mockReviews;
+  }
+
   async searchProducts(query: string, options: { limit?: number } = {}): Promise<RealProduct[]> {
     const cacheKey = `search_${query}_${JSON.stringify(options)}`;
     

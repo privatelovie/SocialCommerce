@@ -195,8 +195,8 @@ const ProductPage: React.FC<ProductPageProps> = ({ productId, onClose, onBack })
     
     const newReview: ProductReview = {
       id: Date.now().toString(),
+      productId: product.id,
       user: {
-        id: user.id,
         name: user.displayName,
         avatar: user.avatar,
         verified: user.isVerified
@@ -206,7 +206,8 @@ const ProductPage: React.FC<ProductPageProps> = ({ productId, onClose, onBack })
       comment: userReview.comment,
       date: new Date().toISOString(),
       helpful: 0,
-      verified: true
+      verified: true,
+      source: 'user'
     };
     
     setReviews([newReview, ...reviews]);
