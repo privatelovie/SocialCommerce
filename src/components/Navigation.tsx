@@ -534,6 +534,7 @@ const Navigation: React.FC<NavigationProps> = ({
             <Button
               variant="contained"
               startIcon={<Add />}
+              onClick={() => onViewChange('create')}
               sx={{
                 display: { xs: 'none', sm: 'flex' },
                 borderRadius: '12px',
@@ -732,6 +733,7 @@ const Navigation: React.FC<NavigationProps> = ({
         
         {/* Mobile Create Button */}
         <IconButton
+          onClick={() => onViewChange('create')}
           sx={{
             background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
             color: 'white',

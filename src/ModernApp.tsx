@@ -26,7 +26,7 @@ import {
 // Context Providers
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { SocialProvider } from './context/SocialContext';
-import { CartProvider } from './context/CartContext';
+import { CartProvider, useCart } from './context/CartContext';
 
 // Components
 import Navigation from './components/Navigation';
@@ -37,6 +37,8 @@ import VideoPromotion from './components/VideoPromotion';
 import DirectMessages from './components/DirectMessages';
 import EnhancedProfile from './components/EnhancedProfile';
 import AnalyticsDashboard from './components/AnalyticsDashboard';
+import CreatePost from './components/CreatePost';
+import Settings from './components/Settings';
 
 // Pages
 import ExplorePage from './pages/ExplorePage';
@@ -326,6 +328,7 @@ const AuthModal: React.FC<{
 // Main App Content Component
 const AppContent: React.FC = () => {
   const { isAuthenticated, user } = useAuth();
+  const { state: cartState, addItem: addToCart, toggleCart } = useCart();
   const [currentView, setCurrentView] = useState('feed');
   const [posts, setPosts] = useState(mockSocialPosts);
   const [authModalOpen, setAuthModalOpen] = useState(false);
@@ -333,6 +336,8 @@ const AppContent: React.FC = () => {
   const [selectedPost, setSelectedPost] = useState<any>(null);
   const [commentsOpen, setCommentsOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [wishlistItems, setWishlistItems] = useState<any[]>([]);
+  const [showSettings, setShowSettings] = useState(false);
 
   // Handle navigation
   const handleNavigate = (path: string) => {
@@ -368,6 +373,28 @@ const AppContent: React.FC = () => {
 
   const handleShareCart = (chatId: string) => {
     setSnackbarMessage('Cart shared successfully!');
+  };
+
+  const handleAddToCart = (product: any) => {
+    addToCart(product);
+    setSnackbarMessage(`${product.name} added to cart!`);
+  };
+
+  const handleToggleWishlist = (product: any) => {
+    const isInWishlist = wishlistItems.some(item => item.id === product.id);
+    if (isInWishlist) {
+      setWishlistItems(prev => prev.filter(item => item.id !== product.id));
+      setSnackbarMessage(`${product.name} removed from wishlist`);
+    } else {
+      setWishlistItems(prev => [...prev, product]);
+      setSnackbarMessage(`${product.name} added to wishlist!`);
+    }
+  };
+
+  const handlePostCreated = (newPost: any) => {
+    setPosts(prev => [newPost, ...prev]);
+    setSnackbarMessage('Post created successfully!');
+    setCurrentView('feed');
   };
 
   // Landing page for unauthenticated users
@@ -458,11 +485,11 @@ const AppContent: React.FC = () => {
         onViewChange={setCurrentView}
         searchQuery=""
         onSearchChange={handleSearch}
-        cartItemsCount={0}
-        wishlistCount={0}
+        cartItemsCount={cartState.totalItems}
+        wishlistCount={wishlistItems.length}
         notificationsCount={0}
-        onCartOpen={() => {}}
-        onNotificationsOpen={() => {}}
+        onCartOpen={toggleCart}
+        onNotificationsOpen={() => setSnackbarMessage('Notifications opened!')}
       />
 
       <Container maxWidth="lg" sx={{ pt: 10, pb: 4 }}>
@@ -493,11 +520,12 @@ const AppContent: React.FC = () => {
                       onLike={() => handleLikePost(post.id)}
                       onBookmark={() => {}}
                       onFollow={() => {}}
-                      onAddToCart={() => {}}
+                      onAddToCart={handleAddToCart}
                       onProductClick={() => {}}
-                      onWishlist={() => {}}
+                      onWishlist={handleToggleWishlist}
                       onToggleComments={() => handlePostClick(post)}
-                      wishlistItems={[]}
+                      wishlistItems={wishlistItems}
+                      cartItems={cartState.items}
                       aiInsightsEnabled={true}
                     />
                   </motion.div>
@@ -579,6 +607,32 @@ const AppContent: React.FC = () => {
                 onPostClick={handlePostClick}
                 onFollowToggle={() => {}}
               />
+            </motion.div>
+          )}
+
+          {/* Create View */}
+          {currentView === 'create' && (
+            <motion.div
+              key="create"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+            >
+              <CreatePost onPostCreated={handlePostCreated} />
+            </motion.div>
+          )}
+
+          {/* Settings View */}
+          {currentView === 'settings' && (
+            <motion.div
+              key="settings"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+            >
+              <Settings onClose={() => setCurrentView('feed')} />
             </motion.div>
           )}
 
