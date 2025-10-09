@@ -622,7 +622,7 @@ const AppContent: React.FC = () => {
                 isOwnProfile={true}
                 onProductClick={(product) => handleProductClick(product.id)}
                 onPostClick={handlePostClick}
-                onFollowToggle={() => {}
+                onFollowToggle={() => {}}
               />
             </motion.div>
           )}
