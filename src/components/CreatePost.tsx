@@ -14,7 +14,6 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  Grid,
   Alert,
   LinearProgress,
   Divider,
@@ -281,38 +280,36 @@ const CreatePost: React.FC<CreatePostProps> = ({ onPostCreated, onClose }) => {
           {/* Selected Images */}
           {selectedImages.length > 0 && (
             <Box mb={2}>
-              <Grid container spacing={1}>
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
                 {selectedImages.map((image, index) => (
-                  <Grid xs={6} sm={3} key={index}>
-                    <Box position="relative">
-                      <img
-                        src={URL.createObjectURL(image)}
-                        alt={`Upload ${index + 1}`}
-                        style={{
-                          width: '100%',
-                          height: 120,
-                          objectFit: 'cover',
-                          borderRadius: '8px'
-                        }}
-                      />
-                      <IconButton
-                        size="small"
-                        onClick={() => removeImage(index)}
-                        sx={{
-                          position: 'absolute',
-                          top: 4,
-                          right: 4,
-                          backgroundColor: 'rgba(0,0,0,0.5)',
-                          color: 'white',
-                          '&:hover': { backgroundColor: 'rgba(0,0,0,0.7)' }
-                        }}
-                      >
-                        <Close fontSize="small" />
-                      </IconButton>
-                    </Box>
-                  </Grid>
+                  <Box key={index} sx={{ width: { xs: 'calc(50% - 4px)', sm: 'calc(25% - 6px)' }, position: 'relative' }}>
+                    <img
+                      src={URL.createObjectURL(image)}
+                      alt={`Upload ${index + 1}`}
+                      style={{
+                        width: '100%',
+                        height: 120,
+                        objectFit: 'cover',
+                        borderRadius: '8px'
+                      }}
+                    />
+                    <IconButton
+                      size="small"
+                      onClick={() => removeImage(index)}
+                      sx={{
+                        position: 'absolute',
+                        top: 4,
+                        right: 4,
+                        backgroundColor: 'rgba(0,0,0,0.5)',
+                        color: 'white',
+                        '&:hover': { backgroundColor: 'rgba(0,0,0,0.7)' }
+                      }}
+                    >
+                      <Close fontSize="small" />
+                    </IconButton>
+                  </Box>
                 ))}
-              </Grid>
+              </Box>
             </Box>
           )}
 
@@ -605,9 +602,9 @@ const CreatePost: React.FC<CreatePostProps> = ({ onPostCreated, onClose }) => {
             </Box>
           )}
 
-          <Grid container spacing={2}>
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
             {searchedProducts.map((product) => (
-              <Grid xs={12} sm={6} md={4} key={product.id}>
+              <Box key={product.id} sx={{ width: { xs: '100%', sm: 'calc(50% - 8px)', md: 'calc(33.333% - 11px)' } }}>
                 <Card
                   variant="outlined"
                   onClick={() => handleProductSelect(product)}
@@ -636,9 +633,9 @@ const CreatePost: React.FC<CreatePostProps> = ({ onPostCreated, onClose }) => {
                     </Typography>
                   </CardContent>
                 </Card>
-              </Grid>
+              </Box>
             ))}
-          </Grid>
+          </Box>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setProductDialogOpen(false)}>Cancel</Button>
@@ -654,9 +651,9 @@ const CreatePost: React.FC<CreatePostProps> = ({ onPostCreated, onClose }) => {
       >
         <DialogTitle>Add Emoji</DialogTitle>
         <DialogContent>
-          <Grid container spacing={1}>
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
             {commonEmojis.map((emoji) => (
-              <Grid xs={3} key={emoji}>
+              <Box key={emoji} sx={{ width: 'calc(25% - 6px)' }}>
                 <Button
                   onClick={() => addEmoji(emoji)}
                   sx={{
@@ -668,9 +665,9 @@ const CreatePost: React.FC<CreatePostProps> = ({ onPostCreated, onClose }) => {
                 >
                   {emoji}
                 </Button>
-              </Grid>
+              </Box>
             ))}
-          </Grid>
+          </Box>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setEmojiDialogOpen(false)}>Close</Button>
