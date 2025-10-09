@@ -546,7 +546,7 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({ onClose, onSave }) => {
               Add
             </Button>
           </Box>
-        </Grid>
+        </Box>
         
         {/* Suggested Interests */}
         <Box>
