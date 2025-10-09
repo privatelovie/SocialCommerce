@@ -462,6 +462,7 @@ export class DemoRealProductService {
       }
     ];
   }
+}
 
 // Price tracking service
 export class PriceTrackingService {
