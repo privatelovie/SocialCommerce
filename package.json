@@ -56,7 +56,6 @@
     "analyze": "npm run build:analyze",
     "pre-commit": "npm run lint && npm run typecheck",
     "clean": "rm -rf build node_modules/.cache",
-    "postinstall": "npm run typecheck"
   },
   "eslintConfig": {
     "extends": [
