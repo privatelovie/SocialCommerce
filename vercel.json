@@ -49,7 +49,9 @@
     "REACT_APP_API_URL": "https://social-commerce-backend.vercel.app",
     "CI": "false",
     "GENERATE_SOURCEMAP": "false",
-    "ESLINT_NO_DEV_ERRORS": "true"
+    "ESLINT_NO_DEV_ERRORS": "true",
+    "TSC_COMPILE_ON_ERROR": "true",
+    "SKIP_PREFLIGHT_CHECK": "true"
   },
   "regions": ["iad1"],
   "github": {

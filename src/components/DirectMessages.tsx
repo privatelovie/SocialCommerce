@@ -105,6 +105,9 @@ const DirectMessages: React.FC<DirectMessagesProps> = ({
   const [messageMenuAnchor, setMessageMenuAnchor] = useState<null | HTMLElement>(null);
   const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
   const [replyingTo, setReplyingTo] = useState<Message | null>(null);
+  const [shareDialogOpen, setShareDialogOpen] = useState(false);
+  const [shareType, setShareType] = useState<'cart' | 'product'>('cart');
+  const [shareData, setShareData] = useState<any>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Mock data initialization
@@ -286,10 +289,68 @@ const DirectMessages: React.FC<DirectMessagesProps> = ({
     setMessageMenuAnchor(null);
   };
 
+  const openShareDialog = (type: 'cart' | 'product', data?: any) => {
+    setShareType(type);
+    setShareData(data);
+    setShareDialogOpen(true);
+  };
+
   const handleShareCart = () => {
-    if (selectedChat && onShareCart) {
+    if (!selectedChat) return;
+    
+    const cartMessage: Message = {
+      id: Date.now().toString(),
+      senderId: currentUser.id,
+      content: 'Shared my shopping cart with you! 🛒',
+      type: 'cart',
+      timestamp: new Date(),
+      status: 'sent',
+      reactions: {},
+      metadata: shareData
+    };
+
+    setChats(prev => prev.map(chat => 
+      chat.id === selectedChat.id 
+        ? { ...chat, messages: [...chat.messages, cartMessage] }
+        : chat
+    ));
+
+    setSelectedChat(prev => prev ? { ...prev, messages: [...prev.messages, cartMessage] } : null);
+
+    if (onShareCart) {
       onShareCart(selectedChat.id);
     }
+    
+    setShareDialogOpen(false);
+  };
+
+  const handleShareProduct = () => {
+    if (!selectedChat || !shareData) return;
+    
+    const productMessage: Message = {
+      id: Date.now().toString(),
+      senderId: currentUser.id,
+      content: `Check out this product! 🔥`,
+      type: 'product',
+      timestamp: new Date(),
+      status: 'sent',
+      reactions: {},
+      metadata: shareData
+    };
+
+    setChats(prev => prev.map(chat => 
+      chat.id === selectedChat.id 
+        ? { ...chat, messages: [...chat.messages, productMessage] }
+        : chat
+    ));
+
+    setSelectedChat(prev => prev ? { ...prev, messages: [...prev.messages, productMessage] } : null);
+
+    if (onProductShare) {
+      onProductShare(shareData.id, selectedChat.id);
+    }
+    
+    setShareDialogOpen(false);
   };
 
   const getOtherUser = (chat: Chat): User => {
@@ -529,9 +590,11 @@ const DirectMessages: React.FC<DirectMessagesProps> = ({
               </Box>
             </Box>
             <Box>
-              <IconButton onClick={handleShareCart}>
-                <ShoppingCart />
-              </IconButton>
+              <Tooltip title="Share Cart">
+                <IconButton onClick={() => openShareDialog('cart')}>
+                  <ShoppingCart />
+                </IconButton>
+              </Tooltip>
               <IconButton>
                 <MoreVert />
               </IconButton>
@@ -746,6 +809,53 @@ const DirectMessages: React.FC<DirectMessagesProps> = ({
           Report
         </MenuItem>
       </Menu>
+
+      {/* Share Dialog */}
+      <Dialog 
+        open={shareDialogOpen} 
+        onClose={() => setShareDialogOpen(false)}
+        maxWidth="sm" 
+        fullWidth
+      >
+        <DialogTitle>
+          {shareType === 'cart' ? 'Share Shopping Cart' : 'Share Product'}
+        </DialogTitle>
+        <DialogContent>
+          <Box sx={{ textAlign: 'center', py: 2 }}>
+            {shareType === 'cart' ? (
+              <Box>
+                <ShoppingCart sx={{ fontSize: 48, color: 'primary.main', mb: 2 }} />
+                <Typography variant="h6" gutterBottom>
+                  Share your cart with {getOtherUser(selectedChat!).displayName}?
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  They'll see all the items in your cart and can add them to their own.
+                </Typography>
+              </Box>
+            ) : (
+              <Box>
+                <Typography variant="h6" gutterBottom>
+                  Share Product
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Send this product recommendation to {getOtherUser(selectedChat!).displayName}?
+                </Typography>
+              </Box>
+            )}
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setShareDialogOpen(false)}>
+            Cancel
+          </Button>
+          <Button 
+            variant="contained" 
+            onClick={shareType === 'cart' ? handleShareCart : handleShareProduct}
+          >
+            Share
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };

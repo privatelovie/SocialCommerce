@@ -10,7 +10,6 @@ import {
   Button,
   IconButton,
   Avatar,
-  Grid,
   Tab,
   Tabs,
   Badge,
@@ -278,21 +277,21 @@ const HashtagExplorer: React.FC<HashtagExplorerProps> = ({ onClose, onHashtagCli
       </Typography>
       
       {loading ? (
-        <Grid container spacing={3}>
+        <Box display="flex" flexWrap="wrap" gap={3}>
           {[...Array(8)].map((_, index) => (
-            <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
+            <Box key={index} sx={{ flex: { xs: '1 1 100%', sm: '1 1 45%', md: '1 1 30%', lg: '1 1 22%' } }}>
               <Skeleton variant="rectangular" height={160} sx={{ borderRadius: 2 }} />
-            </Grid>
+            </Box>
           ))}
-        </Grid>
+        </Box>
       ) : (
-        <Grid container spacing={3}>
+        <Box display="flex" flexWrap="wrap" gap={3}>
           {trendingHashtags.map((hashtag) => (
-            <Grid item xs={12} sm={6} md={4} lg={3} key={hashtag.id}>
+            <Box key={hashtag.id} sx={{ flex: { xs: '1 1 100%', sm: '1 1 45%', md: '1 1 30%', lg: '1 1 22%' } }}>
               {renderHashtagCard(hashtag)}
-            </Grid>
+            </Box>
           ))}
-        </Grid>
+        </Box>
       )}
     </Box>
   );
@@ -323,21 +322,21 @@ const HashtagExplorer: React.FC<HashtagExplorerProps> = ({ onClose, onHashtagCli
       {searchQuery && (
         <>
           {loading ? (
-            <Grid container spacing={3}>
+            <Box display="flex" flexWrap="wrap" gap={3}>
               {[...Array(6)].map((_, index) => (
-                <Grid item xs={12} sm={6} md={4} key={index}>
+                <Box key={index} sx={{ flex: { xs: '1 1 100%', sm: '1 1 45%', md: '1 1 30%' } }}>
                   <Skeleton variant="rectangular" height={160} sx={{ borderRadius: 2 }} />
-                </Grid>
+                </Box>
               ))}
-            </Grid>
+            </Box>
           ) : searchResults.length > 0 ? (
-            <Grid container spacing={3}>
+            <Box display="flex" flexWrap="wrap" gap={3}>
               {searchResults.map((hashtag) => (
-                <Grid item xs={12} sm={6} md={4} key={hashtag.id}>
+                <Box key={hashtag.id} sx={{ flex: { xs: '1 1 100%', sm: '1 1 45%', md: '1 1 30%' } }}>
                   {renderHashtagCard(hashtag)}
-                </Grid>
+                </Box>
               ))}
-            </Grid>
+            </Box>
           ) : (
             <Paper sx={{ p: 4, textAlign: 'center', bgcolor: 'grey.50' }}>
               <SearchIcon sx={{ fontSize: 48, color: 'grey.400', mb: 2 }} />
@@ -408,9 +407,9 @@ const HashtagExplorer: React.FC<HashtagExplorerProps> = ({ onClose, onHashtagCli
             </Box>
           </Paper>
           
-          <Grid container spacing={3}>
+          <Box display="flex" flexDirection={{ xs: 'column', lg: 'row' }} gap={3}>
             {/* Posts */}
-            <Grid item xs={12} lg={8}>
+            <Box sx={{ flex: { xs: '1 1 100%', lg: '1 1 65%' } }}>
               <Typography variant="h6" fontWeight={600} sx={{ mb: 2 }}>
                 Recent Posts
               </Typography>
@@ -436,10 +435,10 @@ const HashtagExplorer: React.FC<HashtagExplorerProps> = ({ onClose, onHashtagCli
                   </Typography>
                 </Paper>
               )}
-            </Grid>
+            </Box>
             
             {/* Related Hashtags */}
-            <Grid item xs={12} lg={4}>
+            <Box sx={{ flex: { xs: '1 1 100%', lg: '1 1 35%' } }}>
               <Typography variant="h6" fontWeight={600} sx={{ mb: 2 }}>
                 Related Hashtags
               </Typography>
@@ -474,8 +473,8 @@ const HashtagExplorer: React.FC<HashtagExplorerProps> = ({ onClose, onHashtagCli
                   </Typography>
                 </Paper>
               )}
-            </Grid>
-          </Grid>
+            </Box>
+          </Box>
         </>
       ) : (
         <Paper sx={{ p: 4, textAlign: 'center', bgcolor: 'grey.50' }}>

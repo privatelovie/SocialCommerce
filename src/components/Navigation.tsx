@@ -32,10 +32,15 @@ import {
   Settings,
   LocalOffer,
   Star,
-  History
+  History,
+  DarkMode,
+  LightMode,
+  VideoLibrary,
+  Message
 } from '@mui/icons-material';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCart } from '../context/CartContext';
+import { useThemeMode } from '../context/ThemeContext';
 import demoProductService from '../services/demoRealProducts';
 import { OpenProductService } from '../services/productApi';
 import { RealProduct } from '../services/productApi';
@@ -90,6 +95,7 @@ const Navigation: React.FC<NavigationProps> = ({
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   
   const { state: cartState } = useCart();
+  const { mode: themeMode, toggleTheme } = useThemeMode();
   const openProductService = useMemo(() => new OpenProductService(), []);
   
   // Load recent searches from localStorage
@@ -245,26 +251,35 @@ const Navigation: React.FC<NavigationProps> = ({
   const navItems = [
     { key: 'feed', label: 'Feed', icon: Home },
     { key: 'explore', label: 'Explore', icon: Explore },
+    { key: 'videos', label: 'Reels', icon: VideoLibrary },
+    { key: 'messages', label: 'Messages', icon: Message },
     { key: 'trending', label: 'Trending', icon: TrendingUp },
-    { key: 'hashtags', label: 'Hashtags', icon: LocalOffer },
-    { key: 'people', label: 'People', icon: Person },
-    { key: 'profile', label: 'Profile', icon: Settings }
+    { key: 'profile', label: 'Profile', icon: Person }
   ];
 
   return (
     <>
       {/* Top App Bar */}
       <AppBar 
-        position="sticky" 
+        position="fixed" 
         elevation={0} 
         sx={{ 
           background: 'rgba(255, 255, 255, 0.95)',
           backdropFilter: 'blur(20px)',
           borderBottom: '1px solid rgba(0, 0, 0, 0.08)',
-          color: '#1a1a1a'
+          color: '#1a1a1a',
+          width: '100%',
+          left: 0,
+          right: 0,
+          zIndex: 1100
         }}
       >
-        <Toolbar sx={{ py: 1, px: { xs: 2, md: 3 } }}>
+        <Toolbar sx={{ 
+          py: 1, 
+          px: { xs: 1, sm: 2, md: 3 },
+          minHeight: { xs: 56, md: 64 },
+          width: '100%'
+        }}>
           {/* Logo */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
@@ -587,6 +602,29 @@ const Navigation: React.FC<NavigationProps> = ({
               </IconButton>
             </motion.div>
             
+            {/* Theme Toggle */}
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <IconButton 
+                onClick={toggleTheme}
+                sx={{ 
+                  background: 'rgba(255, 255, 255, 0.9)',
+                  backdropFilter: 'blur(10px)',
+                  border: '1px solid rgba(0, 0, 0, 0.05)',
+                  '&:hover': {
+                    background: 'rgba(255, 255, 255, 1)',
+                    transform: 'translateY(-1px)',
+                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
+                  }
+                }}
+              >
+                {themeMode === 'dark' ? (
+                  <LightMode sx={{ color: '#fbbf24', fontSize: 20 }} />
+                ) : (
+                  <DarkMode sx={{ color: '#6b7280', fontSize: 20 }} />
+                )}
+              </IconButton>
+            </motion.div>
+            
             {/* Wishlist */}
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <IconButton 
@@ -715,7 +753,52 @@ const Navigation: React.FC<NavigationProps> = ({
         py: 1,
         zIndex: 1000
       }}>
-        {navItems.map(({ key, icon: Icon }) => (
+        {navItems.slice(0, 2).map(({ key, icon: Icon }) => (
+          <IconButton
+            key={key}
+            onClick={() => onViewChange(key)}
+            sx={{
+              color: currentView === key ? '#667eea' : '#64748b',
+              background: currentView === key ? 'rgba(102, 126, 234, 0.1)' : 'transparent',
+              borderRadius: '12px',
+              p: 1.5,
+              '&:hover': {
+                background: currentView === key ? 'rgba(102, 126, 234, 0.15)' : 'rgba(100, 116, 139, 0.08)'
+              }
+            }}
+          >
+            <Icon />
+          </IconButton>
+        ))}
+        
+        {/* Mobile Cart Icon */}
+        <IconButton
+          onClick={onCartOpen}
+          sx={{
+            color: '#667eea',
+            borderRadius: '12px',
+            p: 1.5,
+            '&:hover': {
+              background: 'rgba(102, 126, 234, 0.08)'
+            }
+          }}
+        >
+          <Badge 
+            badgeContent={cartItemsCount} 
+            color="primary"
+            sx={{
+              '& .MuiBadge-badge': {
+                fontSize: '9px',
+                height: '14px',
+                minWidth: '14px'
+              }
+            }}
+          >
+            <ShoppingCart />
+          </Badge>
+        </IconButton>
+        
+        {navItems.slice(2).map(({ key, icon: Icon }) => (
           <IconButton
             key={key}
             onClick={() => onViewChange(key)}

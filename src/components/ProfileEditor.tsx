@@ -9,7 +9,6 @@ import {
   Avatar,
   Card,
   CardContent,
-  Grid,
   Switch,
   FormControlLabel,
   Select,
@@ -249,78 +248,74 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({ onClose, onSave }) => {
             Profile Photos
           </Typography>
           
-          <Grid container spacing={3}>
+          <Box display="flex" flexDirection={{ xs: 'column', md: 'row' }} gap={3}>
             {/* Avatar */}
-            <Grid item xs={12} md={6}>
-              <Box textAlign="center">
-                <Box position="relative" display="inline-block" mb={2}>
-                  <Avatar
-                    src={profile.avatar}
-                    sx={{ width: 120, height: 120, mx: 'auto' }}
-                  />
-                  <IconButton
-                    sx={{
-                      position: 'absolute',
-                      bottom: -5,
-                      right: -5,
-                      bgcolor: 'primary.main',
-                      color: 'white',
-                      '&:hover': { bgcolor: 'primary.dark' }
-                    }}
-                    onClick={() => handleImageUpload('avatar')}
-                  >
-                    <PhotoCamera fontSize="small" />
-                  </IconButton>
-                </Box>
-                <Typography variant="body2" color="text.secondary">
-                  Profile Picture
-                </Typography>
+            <Box sx={{ flex: '1 1 50%', textAlign: 'center' }}>
+              <Box position="relative" display="inline-block" mb={2}>
+                <Avatar
+                  src={profile.avatar}
+                  sx={{ width: 120, height: 120, mx: 'auto' }}
+                />
+                <IconButton
+                  sx={{
+                    position: 'absolute',
+                    bottom: -5,
+                    right: -5,
+                    bgcolor: 'primary.main',
+                    color: 'white',
+                    '&:hover': { bgcolor: 'primary.dark' }
+                  }}
+                  onClick={() => handleImageUpload('avatar')}
+                >
+                  <PhotoCamera fontSize="small" />
+                </IconButton>
               </Box>
-            </Grid>
+              <Typography variant="body2" color="text.secondary">
+                Profile Picture
+              </Typography>
+            </Box>
             
             {/* Cover Photo */}
-            <Grid item xs={12} md={6}>
-              <Box textAlign="center">
-                <Box
+            <Box sx={{ flex: '1 1 50%', textAlign: 'center' }}>
+              <Box
+                sx={{
+                  width: '100%',
+                  height: 120,
+                  bgcolor: 'grey.100',
+                  borderRadius: 2,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  backgroundImage: profile.coverPhoto ? `url(${profile.coverPhoto})` : 'none',
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                  position: 'relative',
+                  mb: 2
+                }}
+              >
+                <IconButton
                   sx={{
-                    width: '100%',
-                    height: 120,
-                    bgcolor: 'grey.100',
-                    borderRadius: 2,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    backgroundImage: profile.coverPhoto ? `url(${profile.coverPhoto})` : 'none',
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center',
-                    position: 'relative',
-                    mb: 2
+                    position: 'absolute',
+                    bgcolor: 'rgba(0,0,0,0.6)',
+                    color: 'white',
+                    '&:hover': { bgcolor: 'rgba(0,0,0,0.8)' }
                   }}
+                  onClick={() => handleImageUpload('cover')}
                 >
-                  <IconButton
-                    sx={{
-                      position: 'absolute',
-                      bgcolor: 'rgba(0,0,0,0.6)',
-                      color: 'white',
-                      '&:hover': { bgcolor: 'rgba(0,0,0,0.8)' }
-                    }}
-                    onClick={() => handleImageUpload('cover')}
-                  >
-                    <PhotoCamera />
-                  </IconButton>
-                </Box>
-                <Typography variant="body2" color="text.secondary">
-                  Cover Photo
-                </Typography>
+                  <PhotoCamera />
+                </IconButton>
               </Box>
-            </Grid>
-          </Grid>
+              <Typography variant="body2" color="text.secondary">
+                Cover Photo
+              </Typography>
+            </Box>
+          </Box>
         </CardContent>
       </Card>
 
       {/* Basic Details */}
-      <Grid container spacing={3}>
-        <Grid item xs={12} md={6}>
+      <Box display="flex" flexWrap="wrap" gap={3}>
+        <Box sx={{ flex: { xs: '1 1 100%', md: '1 1 45%' } }}>
           <TextField
             fullWidth
             label="Display Name"
@@ -328,9 +323,9 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({ onClose, onSave }) => {
             onChange={handleInputChange('displayName')}
             sx={{ mb: 2 }}
           />
-        </Grid>
+        </Box>
         
-        <Grid item xs={12} md={6}>
+        <Box sx={{ flex: { xs: '1 1 100%', md: '1 1 45%' } }}>
           <TextField
             fullWidth
             label="Username"
@@ -341,9 +336,9 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({ onClose, onSave }) => {
               startAdornment: <Typography color="text.secondary">@</Typography>
             }}
           />
-        </Grid>
+        </Box>
         
-        <Grid item xs={12}>
+        <Box sx={{ flex: '1 1 100%' }}>
           <TextField
             fullWidth
             label="Bio"
@@ -354,9 +349,9 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({ onClose, onSave }) => {
             placeholder="Tell us about yourself..."
             sx={{ mb: 2 }}
           />
-        </Grid>
+        </Box>
         
-        <Grid item xs={12} md={6}>
+        <Box sx={{ flex: { xs: '1 1 100%', md: '1 1 45%' } }}>
           <TextField
             fullWidth
             label="Location"
@@ -367,9 +362,9 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({ onClose, onSave }) => {
             }}
             sx={{ mb: 2 }}
           />
-        </Grid>
+        </Box>
         
-        <Grid item xs={12} md={6}>
+        <Box sx={{ flex: { xs: '1 1 100%', md: '1 1 45%' } }}>
           <TextField
             fullWidth
             label="Website"
@@ -380,9 +375,9 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({ onClose, onSave }) => {
             }}
             sx={{ mb: 2 }}
           />
-        </Grid>
+        </Box>
         
-        <Grid item xs={12} md={6}>
+        <Box sx={{ flex: { xs: '1 1 100%', md: '1 1 45%' } }}>
           <TextField
             fullWidth
             label="Date of Birth"
@@ -395,9 +390,9 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({ onClose, onSave }) => {
             }}
             sx={{ mb: 2 }}
           />
-        </Grid>
+        </Box>
         
-        <Grid item xs={12} md={6}>
+        <Box sx={{ flex: { xs: '1 1 100%', md: '1 1 45%' } }}>
           <TextField
             fullWidth
             label="Occupation"
@@ -408,8 +403,8 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({ onClose, onSave }) => {
             }}
             sx={{ mb: 2 }}
           />
-        </Grid>
-      </Grid>
+        </Box>
+      </Box>
     </Box>
   );
 
@@ -419,10 +414,10 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({ onClose, onSave }) => {
         Social Links
       </Typography>
       
-      <Grid container spacing={3}>
+      <Box display="flex" flexWrap="wrap" gap={3}>
         {/* Existing Social Links */}
         {profile.socialLinks.map((link, index) => (
-          <Grid item xs={12} md={6} key={index}>
+          <Box key={index} sx={{ flex: { xs: '1 1 100%', md: '1 1 45%' } }}>
             <Card>
               <CardContent>
                 <Box display="flex" alignItems="center" gap={2} mb={2}>
@@ -447,11 +442,11 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({ onClose, onSave }) => {
                 />
               </CardContent>
             </Card>
-          </Grid>
+          </Box>
         ))}
         
         {/* Add New Social Links */}
-        <Grid item xs={12}>
+        <Box sx={{ flex: '1 1 100%' }}>
           <Typography variant="h6" sx={{ mb: 2 }}>Add Social Platform</Typography>
           <Stack direction="row" spacing={1} flexWrap="wrap">
             {[
@@ -474,8 +469,8 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({ onClose, onSave }) => {
               </Button>
             ))}
           </Stack>
-        </Grid>
-      </Grid>
+        </Box>
+      </Box>
     </Box>
   );
 
@@ -659,8 +654,8 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({ onClose, onSave }) => {
         Preferences
       </Typography>
       
-      <Grid container spacing={3}>
-        <Grid item xs={12} md={6}>
+      <Box display="flex" flexWrap="wrap" gap={3}>
+        <Box sx={{ flex: { xs: '1 1 100%', md: '1 1 45%' } }}>
           <FormControl fullWidth>
             <InputLabel>Theme</InputLabel>
             <Select
@@ -673,9 +668,9 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({ onClose, onSave }) => {
               <MenuItem value="auto">Auto</MenuItem>
             </Select>
           </FormControl>
-        </Grid>
+        </Box>
         
-        <Grid item xs={12} md={6}>
+        <Box sx={{ flex: { xs: '1 1 100%', md: '1 1 45%' } }}>
           <FormControl fullWidth>
             <InputLabel>Language</InputLabel>
             <Select
@@ -693,9 +688,9 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({ onClose, onSave }) => {
               <MenuItem value="ja">日本語</MenuItem>
             </Select>
           </FormControl>
-        </Grid>
+        </Box>
         
-        <Grid item xs={12}>
+        <Box sx={{ flex: '1 1 100%' }}>
           <Typography variant="h6" sx={{ mb: 2 }}>
             Notifications
           </Typography>
@@ -723,8 +718,8 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({ onClose, onSave }) => {
             label="Push Notifications"
             sx={{ display: 'block' }}
           />
-        </Grid>
-      </Grid>
+        </Box>
+      </Box>
     </Box>
   );
 

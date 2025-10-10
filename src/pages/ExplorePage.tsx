@@ -278,6 +278,8 @@ const ExplorePage: React.FC<ExplorePageProps> = ({
           border: '1px solid rgba(0,0,0,0.08)',
           cursor: 'pointer',
           transition: 'all 0.3s ease',
+          display: 'flex',
+          flexDirection: 'column',
           '&:hover': {
             boxShadow: '0 8px 32px rgba(102, 126, 234, 0.2)',
             border: '1px solid #667eea'
@@ -285,13 +287,29 @@ const ExplorePage: React.FC<ExplorePageProps> = ({
         }}
         onClick={() => onProductClick(product)}
       >
-        <Box position="relative">
+        <Box 
+          position="relative" 
+          sx={{
+            height: viewMode === 'grid' ? 240 : 120,
+            overflow: 'hidden',
+            borderRadius: '12px 12px 0 0'
+          }}
+        >
           <CardMedia
             component="img"
-            height={viewMode === 'grid' ? 200 : 120}
             image={product.image}
             alt={product.name}
-            sx={{ objectFit: 'cover' }}
+            sx={{ 
+              width: '100%',
+              height: '100%',
+              objectFit: 'contain',
+              objectPosition: 'center',
+              background: '#f8f9fa',
+              transition: 'transform 0.3s ease',
+              '&:hover': {
+                transform: 'scale(1.05)'
+              }
+            }}
           />
           
           {/* Badges */}
@@ -375,7 +393,7 @@ const ExplorePage: React.FC<ExplorePageProps> = ({
           </Box>
         </Box>
 
-        <CardContent sx={{ p: 2 }}>
+        <CardContent sx={{ p: 2, flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
           <Typography 
             variant="h6" 
             fontWeight={600} 
@@ -434,7 +452,13 @@ const ExplorePage: React.FC<ExplorePageProps> = ({
   const currentProducts = activeTab === 0 ? trendingProducts : products;
 
   return (
-    <Box sx={{ p: 3, maxWidth: '1400px', mx: 'auto' }}>
+    <Box sx={{ 
+      width: '100%', 
+      maxWidth: '1400px', 
+      mx: 'auto',
+      px: { xs: 1, sm: 2, md: 3 },
+      py: { xs: 2, md: 3 }
+    }}>
       {/* Header */}
       <Box sx={{ mb: 4 }}>
         <Typography variant="h4" fontWeight={700} gutterBottom>
@@ -561,19 +585,21 @@ const ExplorePage: React.FC<ExplorePageProps> = ({
       {/* Products Grid */}
       {currentProducts.length > 0 ? (
         <Box 
-          display="grid" 
-          gridTemplateColumns={{
-            xs: '1fr',
-            sm: viewMode === 'grid' ? 'repeat(2, 1fr)' : '1fr',
-            md: viewMode === 'grid' ? 'repeat(3, 1fr)' : '1fr',
-            lg: viewMode === 'grid' ? 'repeat(4, 1fr)' : '1fr'
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: {
+              xs: '1fr',
+              sm: viewMode === 'grid' ? 'repeat(auto-fit, minmax(280px, 1fr))' : '1fr',
+              md: viewMode === 'grid' ? 'repeat(auto-fit, minmax(300px, 1fr))' : '1fr'
+            },
+            gap: { xs: 2, md: 3 },
+            width: '100%',
+            justifyItems: 'stretch',
+            alignItems: 'start'
           }}
-          gap={3}
         >
           {currentProducts.map((product, index) => (
-            <Box key={product.id}>
-              {renderProductCard(product, index)}
-            </Box>
+            renderProductCard(product, index)
           ))}
         </Box>
       ) : !loading && activeTab === 1 && searchQuery ? (

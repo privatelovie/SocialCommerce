@@ -14,7 +14,6 @@ import {
   DialogContent,
   IconButton
 } from '@mui/material';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -27,13 +26,25 @@ import {
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { SocialProvider } from './context/SocialContext';
 import { CartProvider, useCart } from './context/CartContext';
+import { FavoritesProvider, useFavorites } from './context/FavoritesContext';
+import { CustomThemeProvider } from './context/ThemeContext';
+import ToastProvider from './components/ToastProvider';
+import ErrorBoundary from './components/ErrorBoundary';
+
+// React Query
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import queryClient from './config/queryClient';
 
 // Components
 import Navigation from './components/Navigation';
 import PostCard from './components/PostCard';
 import CommentsDrawer from './components/CommentsDrawer';
+import CartDrawer from './components/CartDrawer';
 import AIGuide from './components/AIGuide';
-import VideoPromotion from './components/VideoPromotion';
+import VideoReelsPage from './pages/VideoReelsPage';
+import MessagingPage from './pages/MessagingPage';
+import DemoLauncher from './components/DemoLauncher';
 import DirectMessages from './components/DirectMessages';
 import EnhancedProfile from './components/EnhancedProfile';
 import AnalyticsDashboard from './components/AnalyticsDashboard';
@@ -53,74 +64,6 @@ import demoRealProducts from './services/demoRealProducts';
 // Styles
 import './styles/modern.css';
 
-// Enhanced Theme
-const theme = createTheme({
-  palette: {
-    mode: 'light',
-    primary: {
-      main: '#667eea',
-      dark: '#5a67d8',
-      light: '#7c87f0',
-    },
-    secondary: {
-      main: '#764ba2',
-      dark: '#6b5b95',
-      light: '#9b6ec9',
-    },
-    background: {
-      default: '#f8fafc',
-      paper: '#ffffff',
-    },
-    text: {
-      primary: '#1a202c',
-      secondary: '#718096',
-    },
-  },
-  shape: {
-    borderRadius: 16,
-  },
-  typography: {
-    fontFamily: '\"Inter\", \"Roboto\", \"Helvetica\", \"Arial\", sans-serif',
-    h1: { fontWeight: 800 },
-    h2: { fontWeight: 700 },
-    h3: { fontWeight: 700 },
-    h4: { fontWeight: 700 },
-    h5: { fontWeight: 600 },
-    h6: { fontWeight: 600 },
-  },
-  components: {
-    MuiButton: {
-      styleOverrides: {
-        root: {
-          borderRadius: 12,
-          textTransform: 'none',
-          fontWeight: 600,
-          boxShadow: 'none',
-          '&:hover': {
-            boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-          },
-        },
-      },
-    },
-    MuiCard: {
-      styleOverrides: {
-        root: {
-          borderRadius: 20,
-          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
-          backdropFilter: 'blur(20px)',
-          border: '1px solid rgba(255, 255, 255, 0.2)',
-        },
-      },
-    },
-    MuiFab: {
-      styleOverrides: {
-        root: {
-          boxShadow: '0 8px 25px rgba(0, 0, 0, 0.15)',
-        },
-      },
-    },
-  },
-});
 
 // Mock Social Posts
 const mockSocialPosts = [
@@ -332,7 +275,8 @@ const AuthModal: React.FC<{
 // Main App Content Component
 const AppContent: React.FC = () => {
   const { isAuthenticated, user } = useAuth();
-  const { state: cartState, addItem: addToCart, toggleCart } = useCart();
+  const { state: cartState, addItem: addToCart, toggleCart, setCartOpen } = useCart();
+  const { state: favoritesState, toggleFavorite, isFavorite } = useFavorites();
   const [currentView, setCurrentView] = useState('feed');
   const [posts, setPosts] = useState(mockSocialPosts);
   const [authModalOpen, setAuthModalOpen] = useState(false);
@@ -340,13 +284,14 @@ const AppContent: React.FC = () => {
   const [selectedPost, setSelectedPost] = useState<any>(null);
   const [commentsOpen, setCommentsOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
-  const [wishlistItems, setWishlistItems] = useState<any[]>([]);
+  const [cartDrawerOpen, setCartDrawerOpen] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
   const [showProductPage, setShowProductPage] = useState(false);
   const [showUserSearch, setShowUserSearch] = useState(false);
   const [showHashtagExplorer, setShowHashtagExplorer] = useState(false);
   const [showProfileEditor, setShowProfileEditor] = useState(false);
+  const [showDemoLauncher, setShowDemoLauncher] = useState(true);
 
   // Handle navigation
   const handleNavigate = (path: string) => {
@@ -359,6 +304,8 @@ const AppContent: React.FC = () => {
     } else if (path === '/edit-profile' || path === 'edit-profile') {
       setShowProfileEditor(true);
       setCurrentView('edit-profile');
+    } else if (path === 'demo-launcher' || path === '/demo-launcher') {
+      setShowDemoLauncher(true);
     } else {
       setCurrentView(path.replace('/', '') || 'feed');
     }
@@ -415,13 +362,11 @@ const AppContent: React.FC = () => {
   };
 
   const handleToggleWishlist = (product: any) => {
-    const isInWishlist = wishlistItems.some(item => item.id === product.id);
-    if (isInWishlist) {
-      setWishlistItems(prev => prev.filter(item => item.id !== product.id));
-      setSnackbarMessage(`${product.name} removed from wishlist`);
+    const wasAdded = toggleFavorite(product);
+    if (wasAdded) {
+      setSnackbarMessage(`${product.name} added to favorites!`);
     } else {
-      setWishlistItems(prev => [...prev, product]);
-      setSnackbarMessage(`${product.name} added to wishlist!`);
+      setSnackbarMessage(`${product.name} removed from favorites`);
     }
   };
 
@@ -429,6 +374,27 @@ const AppContent: React.FC = () => {
     setPosts(prev => [newPost, ...prev]);
     setSnackbarMessage('Post created successfully!');
     setCurrentView('feed');
+  };
+
+  // Demo launcher handlers
+  const handleLaunchReels = () => {
+    setShowDemoLauncher(false);
+    setCurrentView('videos');
+  };
+
+  const handleLaunchApp = () => {
+    setShowDemoLauncher(false);
+    setCurrentView('feed');
+  };
+
+  const handleLaunchMessaging = () => {
+    setShowDemoLauncher(false);
+    setCurrentView('messages');
+  };
+
+  const handleLaunchExplore = () => {
+    setShowDemoLauncher(false);
+    setCurrentView('explore');
   };
 
   // Landing page for unauthenticated users
@@ -510,9 +476,26 @@ const AppContent: React.FC = () => {
     );
   }
 
+  // Show demo launcher first for authenticated users
+  if (showDemoLauncher) {
+    return (
+      <DemoLauncher
+        onLaunchReels={handleLaunchReels}
+        onLaunchApp={handleLaunchApp}
+        onLaunchMessaging={handleLaunchMessaging}
+        onLaunchExplore={handleLaunchExplore}
+      />
+    );
+  }
+
   // Main authenticated app
   return (
-    <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
+    <Box sx={{ 
+      minHeight: '100vh', 
+      bgcolor: 'background.default',
+      width: '100%',
+      overflowX: 'hidden'
+    }}>
       <Navigation
         currentUser={user!}
         currentView={currentView}
@@ -520,14 +503,22 @@ const AppContent: React.FC = () => {
         searchQuery=""
         onSearchChange={handleSearch}
         cartItemsCount={cartState.totalItems}
-        wishlistCount={wishlistItems.length}
+        wishlistCount={favoritesState.totalItems}
         notificationsCount={0}
-        onCartOpen={toggleCart}
+        onCartOpen={() => setCartDrawerOpen(true)}
         onNotificationsOpen={() => setSnackbarMessage('Notifications opened!')}
         onProductClick={(product) => handleProductClick(product.id)}
       />
 
-      <Container maxWidth="lg" sx={{ pt: 10, pb: 4 }}>
+      <Container 
+        maxWidth="xl" 
+        sx={{ 
+          pt: { xs: 12, md: 8 },
+          pb: { xs: 10, md: 4 },
+          px: { xs: 1, sm: 2, md: 3, lg: 4 },
+          minHeight: 'calc(100vh - 140px)'
+        }}
+      >
         <AnimatePresence mode="wait">
           {/* Feed View */}
           {currentView === 'feed' && (
@@ -538,7 +529,11 @@ const AppContent: React.FC = () => {
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.3 }}
             >
-              <Box sx={{ maxWidth: 600, mx: 'auto' }}>
+              <Box sx={{ 
+                maxWidth: { xs: '100%', sm: 600 }, 
+                mx: 'auto',
+                px: { xs: 0, sm: 0 }
+              }}>
                 {posts.map((post) => (
                   <motion.div
                     key={post.id}
@@ -559,7 +554,7 @@ const AppContent: React.FC = () => {
                       onProductClick={() => post.product && handleProductClick(post.product.id)}
                       onWishlist={handleToggleWishlist}
                       onToggleComments={() => handlePostClick(post)}
-                      wishlistItems={wishlistItems}
+                      wishlistItems={favoritesState.items.map(fav => fav.product)}
                       cartItems={cartState.items}
                       aiInsightsEnabled={true}
                     />
@@ -583,13 +578,13 @@ const AppContent: React.FC = () => {
                 onWishlist={handleToggleWishlist}
                 onCompare={() => {}}
                 onShare={() => {}}
-                wishlistItems={wishlistItems}
+                wishlistItems={favoritesState.items.map(fav => fav.product)}
                 compareItems={[]}
               />
             </motion.div>
           )}
 
-          {/* Video Promotions View */}
+          {/* Video Reels View */}
           {currentView === 'videos' && (
             <motion.div
               key="videos"
@@ -598,10 +593,7 @@ const AppContent: React.FC = () => {
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.3 }}
             >
-              <VideoPromotion
-                onProductClick={(product) => handleProductClick(product.id)}
-                onCreateVideo={() => {}}
-              />
+              <VideoReelsPage />
             </motion.div>
           )}
 
@@ -614,16 +606,7 @@ const AppContent: React.FC = () => {
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.3 }}
             >
-              <DirectMessages
-                currentUser={{
-                  ...user!,
-                  isOnline: true,
-                  lastSeen: new Date(),
-                  isVerified: user!.isVerified
-                } as any}
-                onShareCart={handleShareCart}
-                onProductShare={() => {}}
-              />
+              <MessagingPage />
             </motion.div>
           )}
 
@@ -686,7 +669,7 @@ const AppContent: React.FC = () => {
                 onWishlist={handleToggleWishlist}
                 onCompare={() => {}}
                 onShare={() => {}}
-                wishlistItems={wishlistItems}
+                wishlistItems={favoritesState.items.map(fav => fav.product)}
                 compareItems={[]}
               />
             </motion.div>
@@ -780,6 +763,12 @@ const AppContent: React.FC = () => {
         loading={false}
       />
 
+      {/* Cart Drawer */}
+      <CartDrawer
+        open={cartDrawerOpen}
+        onClose={() => setCartDrawerOpen(false)}
+      />
+
       {/* Snackbar for notifications */}
       <Snackbar
         open={!!snackbarMessage}
@@ -820,18 +809,31 @@ const AppContent: React.FC = () => {
 // Main App Component with Providers
 const ModernApp: React.FC = () => {
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <AuthProvider>
-        <SocialProvider>
-          <CartProvider>
-            <Router>
-              <AppContent />
-            </Router>
-          </CartProvider>
-        </SocialProvider>
-      </AuthProvider>
-    </ThemeProvider>
+    <ErrorBoundary level="page">
+      <QueryClientProvider client={queryClient}>
+        <CustomThemeProvider>
+          <AuthProvider>
+            <SocialProvider>
+              <CartProvider>
+                <FavoritesProvider>
+                  <ToastProvider>
+                    <Router>
+                      <ErrorBoundary level="section">
+                        <AppContent />
+                      </ErrorBoundary>
+                    </Router>
+                  </ToastProvider>
+                </FavoritesProvider>
+              </CartProvider>
+            </SocialProvider>
+          </AuthProvider>
+        </CustomThemeProvider>
+        {/* React Query DevTools - only in development */}
+        {process.env.NODE_ENV === 'development' && (
+          <ReactQueryDevtools initialIsOpen={false} />
+        )}
+      </QueryClientProvider>
+    </ErrorBoundary>
   );
 };
 

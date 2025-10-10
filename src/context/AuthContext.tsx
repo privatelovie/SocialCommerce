@@ -1,25 +1,21 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { authService, User as AuthUser, LoginCredentials, RegisterData as AuthRegisterData } from '../services/authService';
+import { socketConfig } from '../config/api';
+import { messagingService } from '../services/messagingService';
+import io, { Socket } from 'socket.io-client';
 
-export interface User {
-  id: string;
-  username: string;
-  email: string;
-  displayName: string;
-  avatar: string;
-  bio: string;
-  isVerified: boolean;
-  followerCount: number;
-  followingCount: number;
-  postCount: number;
-  salesCount: number;
-  totalEarnings: number;
-  joinDate: string;
+// Use the User type from authService but extend it with additional frontend-specific fields
+export interface User extends AuthUser {
+  // Additional frontend-specific fields
+  postCount?: number;
+  followerCount?: number;
+  followingCount?: number;
+  salesCount?: number;
+  totalEarnings?: number;
   location?: string;
   website?: string;
-  isCreator: boolean;
-  creatorLevel: 'bronze' | 'silver' | 'gold' | 'platinum';
-  
-  // Extended profile fields
+  isCreator?: boolean;
+  creatorLevel?: 'bronze' | 'silver' | 'gold' | 'platinum';
   dateOfBirth?: string;
   occupation?: string;
   education?: string;
@@ -49,6 +45,7 @@ interface AuthContextType {
   updateProfile: (updates: Partial<User>) => Promise<boolean>;
   loading: boolean;
   error: string | null;
+  socket: Socket | null;
 }
 
 interface RegisterData {
@@ -72,21 +69,101 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [socket, setSocket] = useState<Socket | null>(null);
+
+  // Initialize Socket.IO connection
+  const initializeSocket = (userId: string) => {
+    if (socket) {
+      socket.disconnect();
+    }
+
+    const newSocket = io(socketConfig.url, {
+      ...socketConfig.options,
+      auth: {
+        userId,
+        token: authService.getToken(),
+      },
+    });
+
+    newSocket.on('connect', () => {
+      console.log('Socket connected:', newSocket.id);
+    });
+
+    newSocket.on('disconnect', () => {
+      console.log('Socket disconnected');
+    });
+
+    newSocket.on('connect_error', (error) => {
+      console.error('Socket connection error:', error);
+    });
+
+    setSocket(newSocket);
+    
+    // Initialize messaging service with socket
+    messagingService.initializeSocket(newSocket);
+  };
+
+  // Map backend user to frontend user format
+  const mapUserData = (authUser: AuthUser): User => {
+    return {
+      ...authUser,
+      // Map field differences
+      followerCount: (authUser as any).followers || 0,
+      followingCount: (authUser as any).following || 0,
+      postCount: (authUser as any).posts || 0,
+      // Add default values for optional fields
+      salesCount: 0,
+      totalEarnings: 0,
+      location: '',
+      website: '',
+      isCreator: false,
+      creatorLevel: 'bronze',
+      dateOfBirth: '',
+      occupation: '',
+      education: '',
+      coverPhoto: '',
+      socialLinks: [],
+      interests: [],
+      isPrivate: false,
+      showEmail: false,
+      showLocation: true,
+      allowMessages: true,
+      emailNotifications: true,
+      pushNotifications: true,
+      theme: 'light',
+      language: 'en',
+    };
+  };
 
   useEffect(() => {
-    // Check for stored authentication
-    const storedUser = localStorage.getItem('user');
-    const token = localStorage.getItem('token');
-    
-    if (storedUser && token) {
-      try {
-        setUser(JSON.parse(storedUser));
-      } catch (err) {
-        localStorage.removeItem('user');
-        localStorage.removeItem('token');
+    const initializeAuth = async () => {
+      setLoading(true);
+      
+      if (authService.isAuthenticated()) {
+        try {
+          // Get fresh user data from backend
+          const response = await authService.getProfile();
+          
+          if (response.success && response.user) {
+            const mappedUser = mapUserData(response.user);
+            setUser(mappedUser);
+            
+            // Initialize Socket.IO connection
+            initializeSocket(response.user.id);
+          } else {
+            // Invalid token, clear auth
+            await authService.logout();
+          }
+        } catch (error) {
+          console.error('Failed to initialize auth:', error);
+          await authService.logout();
+        }
       }
-    }
-    setLoading(false);
+      
+      setLoading(false);
+    };
+    
+    initializeAuth();
   }, []);
 
   const login = async (email: string, password: string): Promise<boolean> => {
@@ -94,53 +171,23 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       setLoading(true);
       setError(null);
 
-      // Simulate API call - replace with actual backend integration
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const response = await authService.login({ email, password });
       
-      // Mock successful login
-      const mockUser: User = {
-        id: '1',
-        username: 'johndoe',
-        email: email,
-        displayName: 'John Doe',
-        avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face',
-        bio: 'Social commerce enthusiast | Creating amazing content',
-        isVerified: true,
-        followerCount: 12500,
-        followingCount: 890,
-        postCount: 342,
-        salesCount: 156,
-        totalEarnings: 25680.50,
-        joinDate: '2023-01-15',
-        location: 'New York, USA',
-        website: 'https://johndoe.com',
-        isCreator: true,
-        creatorLevel: 'gold',
+      if (response.success && response.user) {
+        const mappedUser = mapUserData(response.user);
+        setUser(mappedUser);
         
-        // Extended profile fields with defaults
-        dateOfBirth: '1990-05-15',
-        occupation: 'Content Creator',
-        education: 'Computer Science, NYU',
-        coverPhoto: '',
-        socialLinks: [],
-        interests: ['Technology', 'Photography', 'Travel'],
-        isPrivate: false,
-        showEmail: false,
-        showLocation: true,
-        allowMessages: true,
-        emailNotifications: true,
-        pushNotifications: true,
-        theme: 'light',
-        language: 'en'
-      };
-
-      setUser(mockUser);
-      localStorage.setItem('user', JSON.stringify(mockUser));
-      localStorage.setItem('token', 'mock-jwt-token');
-      
-      return true;
-    } catch (err) {
-      setError('Login failed. Please try again.');
+        // Initialize Socket.IO connection
+        initializeSocket(response.user.id);
+        
+        return true;
+      } else {
+        setError(response.error || 'Login failed. Please try again.');
+        return false;
+      }
+    } catch (err: any) {
+      console.error('Login error:', err);
+      setError(err.message || 'Login failed. Please try again.');
       return false;
     } finally {
       setLoading(false);
@@ -152,44 +199,42 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       setLoading(true);
       setError(null);
 
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      const newUser: User = {
-        id: Date.now().toString(),
-        username: userData.username,
-        email: userData.email,
-        displayName: userData.displayName,
-        avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&h=100&fit=crop&crop=face',
-        bio: '',
-        isVerified: false,
-        followerCount: 0,
-        followingCount: 0,
-        postCount: 0,
-        salesCount: 0,
-        totalEarnings: 0,
-        joinDate: new Date().toISOString().split('T')[0],
-        isCreator: false,
-        creatorLevel: 'bronze'
-      };
-
-      setUser(newUser);
-      localStorage.setItem('user', JSON.stringify(newUser));
-      localStorage.setItem('token', 'mock-jwt-token');
-
-      return true;
-    } catch (err) {
-      setError('Registration failed. Please try again.');
+      const response = await authService.register(userData);
+      
+      if (response.success && response.user) {
+        const mappedUser = mapUserData(response.user);
+        setUser(mappedUser);
+        
+        // Initialize Socket.IO connection
+        initializeSocket(response.user.id);
+        
+        return true;
+      } else {
+        setError(response.error || 'Registration failed. Please try again.');
+        return false;
+      }
+    } catch (err: any) {
+      console.error('Registration error:', err);
+      setError(err.message || 'Registration failed. Please try again.');
       return false;
     } finally {
       setLoading(false);
     }
   };
 
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem('user');
-    localStorage.removeItem('token');
+  const logout = async () => {
+    try {
+      await authService.logout();
+    } catch (error) {
+      console.error('Logout error:', error);
+    } finally {
+      if (socket) {
+        socket.disconnect();
+        setSocket(null);
+      }
+      setUser(null);
+      setError(null);
+    }
   };
 
   const updateProfile = async (updates: Partial<User>): Promise<boolean> => {
@@ -199,16 +244,31 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
       if (!user) return false;
 
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 500));
+      // Extract fields that should be sent to backend
+      const backendUpdates = {
+        displayName: updates.displayName,
+        bio: updates.bio,
+        avatar: updates.avatar,
+      };
 
-      const updatedUser = { ...user, ...updates };
-      setUser(updatedUser);
-      localStorage.setItem('user', JSON.stringify(updatedUser));
-
-      return true;
-    } catch (err) {
-      setError('Profile update failed. Please try again.');
+      const response = await authService.updateProfile(backendUpdates);
+      
+      if (response.success && response.user) {
+        // Merge backend user data with frontend-specific fields
+        const updatedUser = {
+          ...mapUserData(response.user),
+          ...updates, // Include any frontend-specific updates
+        };
+        
+        setUser(updatedUser);
+        return true;
+      } else {
+        setError(response.error || 'Profile update failed. Please try again.');
+        return false;
+      }
+    } catch (err: any) {
+      console.error('Profile update error:', err);
+      setError(err.message || 'Profile update failed. Please try again.');
       return false;
     } finally {
       setLoading(false);
@@ -223,7 +283,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     logout,
     updateProfile,
     loading,
-    error
+    error,
+    socket
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -100,8 +100,8 @@ const PostCard: React.FC<PostCardProps> = ({
   const [relatedProducts, setRelatedProducts] = useState<RealProduct[]>([]);
   const [loadingRelated, setLoadingRelated] = useState(false);
 
-  // Check if product is in cart
-  const isInCart = cartItems.some(item => item.id === post.product?.id);
+  // Check if product is in cart and wishlist
+  const isInCart = cartItems.some(item => item.product.id === post.product?.id);
   const isInWishlist = wishlistItems.some(item => item.id === post.product?.id);
 
   // Load product reviews when product is available
@@ -192,8 +192,8 @@ const PostCard: React.FC<PostCardProps> = ({
         }}
       >
         {/* Post Header */}
-        <CardContent sx={{ p: 3, pb: 2 }}>
-          <Box display="flex" alignItems="flex-start" gap={2}>
+        <CardContent sx={{ p: { xs: 2, md: 3 }, pb: 2 }}>
+          <Box display="flex" alignItems="flex-start" gap={{ xs: 1.5, md: 2 }}>
             <motion.div whileHover={{ scale: 1.05 }}>
               <Avatar 
                 src={post.user.avatar} 
@@ -375,17 +375,29 @@ const PostCard: React.FC<PostCardProps> = ({
                   </Box>
                 )}
                 
-                <Box display="flex" p={2} gap={2} onClick={() => onProductClick(post.product)}>
+                <Box 
+                  display="flex" 
+                  p={{ xs: 1.5, md: 2 }} 
+                  gap={{ xs: 1.5, md: 2 }} 
+                  onClick={() => onProductClick(post.product)}
+                  sx={{
+                    flexDirection: { xs: 'column', sm: 'row' },
+                    alignItems: { xs: 'center', sm: 'flex-start' }
+                  }}
+                >
                   <Box position="relative">
                     <CardMedia
                       component="img"
                       image={post.product.image}
                       alt={post.product.name}
                       sx={{ 
-                        width: 120, 
-                        height: 120, 
+                        width: { xs: 100, sm: 120 }, 
+                        height: { xs: 100, sm: 120 }, 
                         borderRadius: '12px',
-                        objectFit: 'cover'
+                        objectFit: 'contain',
+                        objectPosition: 'center',
+                        background: '#f8f9fa',
+                        flexShrink: 0
                       }}
                     />
                     {post.product.originalPrice && (
@@ -479,10 +491,15 @@ const PostCard: React.FC<PostCardProps> = ({
                       )}
                     </Box>
                     
-                    <Stack direction="row" spacing={1} flexWrap="wrap">
+                    <Stack 
+                      direction={{ xs: 'column', sm: 'row' }} 
+                      spacing={1} 
+                      sx={{ width: '100%' }}
+                    >
                       <Button 
                         variant={isInCart ? "outlined" : "contained"}
                         size="small" 
+                        fullWidth
                         startIcon={isInCart ? <ShoppingCart sx={{ fontSize: '14px' }} /> : <ShoppingBag sx={{ fontSize: '14px' }} />}
                         onClick={(e) => {
                           e.stopPropagation();
@@ -490,34 +507,37 @@ const PostCard: React.FC<PostCardProps> = ({
                         }}
                         sx={{
                           borderRadius: '10px',
-                          fontSize: '11px',
+                          fontSize: { xs: '12px', sm: '11px' },
                           py: 0.8,
-                          px: 1.5,
-                          fontWeight: 600
+                          px: { xs: 2, sm: 1.5 },
+                          fontWeight: 600,
+                          minWidth: { xs: 'auto', sm: 120 }
                         }}
                       >
                         {isInCart ? 'In Cart' : 'Add to Cart'}
                       </Button>
                       
-                      <Tooltip title={isInWishlist ? "Remove from Wishlist" : "Add to Wishlist"}>
-                        <IconButton 
-                          size="small"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            onWishlist(post.product);
-                          }}
-                          sx={{
-                            border: '1px solid rgba(0, 0, 0, 0.1)',
-                            borderRadius: '10px',
-                            color: isInWishlist ? '#f5576c' : 'inherit'
-                          }}
-                        >
-                          {isInWishlist ? 
-                            <Favorite sx={{ fontSize: '16px' }} /> : 
-                            <FavoriteBorder sx={{ fontSize: '16px' }} />
-                          }
-                        </IconButton>
-                      </Tooltip>
+                      <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
+                        <Tooltip title={isInWishlist ? "Remove from Wishlist" : "Add to Wishlist"}>
+                          <IconButton 
+                            size="small"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onWishlist(post.product);
+                            }}
+                            sx={{
+                              border: '1px solid rgba(0, 0, 0, 0.1)',
+                              borderRadius: '10px',
+                              color: isInWishlist ? '#f5576c' : 'inherit'
+                            }}
+                          >
+                            {isInWishlist ? 
+                              <Favorite sx={{ fontSize: '16px' }} /> : 
+                              <FavoriteBorder sx={{ fontSize: '16px' }} />
+                            }
+                          </IconButton>
+                        </Tooltip>
+                      </Box>
                       
                       {onCompareProduct && (
                         <Tooltip title="Compare Product">
