@@ -98,7 +98,7 @@ const QuickNav: React.FC<QuickNavProps> = ({
 
       <Grid container spacing={3}>
         {navItems.map((item, index) => (
-          <Grid item xs={12} sm={6} md={4} key={item.key}>
+          <Grid item key={item.key} xs={12} sm={6} md={4} component="div">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}

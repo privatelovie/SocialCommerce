@@ -145,12 +145,12 @@ const ProfilePage: React.FC<ProfilePageProps> = ({
       // Mock user profile - in real app, fetch from API
       const mockProfile: UserProfile = {
         id: userId || currentUser?.id || '1',
-        name: isOwnProfile ? currentUser?.name || 'John Doe' : 'Sarah Johnson',
-        username: isOwnProfile ? currentUser?.username || 'johndoe' : 'sarahj',
+        name: isOwnProfile ? currentUser?.name || 'Demo User' : 'Sarah Johnson',
+        username: isOwnProfile ? currentUser?.username || 'demo_user' : 'sarahj',
         avatar: isOwnProfile ? currentUser?.avatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150' : 'https://images.unsplash.com/photo-1494790108755-2616b4094b2e?w=150',
         bio: 'Fashion enthusiast & tech lover. Always hunting for the best deals! 🛍️✨',
         location: 'San Francisco, CA',
-        website: 'https://johndoe.dev',
+        website: 'https://demo-user.example.com',
         joinDate: '2023-01-15',
         verified: true,
         tier: 'gold',

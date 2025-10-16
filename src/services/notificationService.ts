@@ -59,22 +59,14 @@ class NotificationService extends EventEmitter {
   constructor() {
     super();
     this.settings = this.loadSettings();
-    this.initializeDesktopNotifications();
     this.setupSocketListeners();
+    // Don't request permission on initialization - only on user interaction
   }
 
-  // Initialize desktop notifications
-  private async initializeDesktopNotifications() {
+  // Initialize desktop notifications - only check permission, don't request
+  private initializeDesktopNotifications() {
     if ('Notification' in window) {
       this.desktopPermission = Notification.permission;
-      
-      if (this.desktopPermission === 'default') {
-        try {
-          this.desktopPermission = await Notification.requestPermission();
-        } catch (error) {
-          console.warn('Desktop notifications not supported or denied');
-        }
-      }
     }
   }
 

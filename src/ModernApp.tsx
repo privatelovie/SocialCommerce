@@ -71,30 +71,30 @@ const mockSocialPosts = [
     id: '1',
     user: {
       id: '1',
-      username: 'johndoe',
-      displayName: 'John Doe',
-      avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face',
+      username: 'fitness_guru_mike',
+      displayName: 'Mike Fitness',
+      avatar: 'https://ui-avatars.com/api/?name=Mike+Fitness&background=4CAF50&color=fff&size=100',
       isVerified: true
     },
-    content: 'Just discovered this amazing new tech gadget! The AI integration is mind-blowing 🤖✨ Perfect for productivity and entertainment. What do you all think? #AI #TechReview #Innovation',
-    media: ['https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=600&h=400&fit=crop'],
-    timestamp: '2 hours ago',
-    likes: 1247,
-    comments: 89,
-    shares: 34,
-    bookmarks: 156,
+    content: 'Finally found the perfect home gym setup! 💪🏠 This compact equipment gives me a full-body workout without taking up my entire living room. Game changer for busy schedules! #HomeGym #FitnessMotivation #WorkoutFromHome',
+    media: ['https://picsum.photos/600/400?random=20'],
+    timestamp: '3 hours ago',
+    likes: 956,
+    comments: 74,
+    shares: 28,
+    bookmarks: 132,
     isLiked: false,
     isBookmarked: false,
-    hashtags: ['#AI', '#TechReview', '#Innovation'],
+    hashtags: ['#HomeGym', '#FitnessMotivation', '#WorkoutFromHome'],
     product: {
       id: '1',
-      name: 'Smart AI Assistant Device',
-      price: 299.99,
-      image: 'https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=300&h=300&fit=crop',
-      description: 'Revolutionary AI-powered smart device',
-      rating: 4.8,
-      reviewCount: 2847,
-      brand: 'TechCorp',
+      name: 'Compact Home Gym System',
+      price: 399.99,
+      image: 'https://picsum.photos/300/300?random=21',
+      description: 'Complete home workout solution in minimal space',
+      rating: 4.7,
+      reviewCount: 1843,
+      brand: 'FitHome',
       inStock: true
     }
   },
@@ -102,24 +102,128 @@ const mockSocialPosts = [
     id: '2',
     user: {
       id: '2',
-      username: 'sarah_style',
-      displayName: 'Sarah Johnson',
-      avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face',
-      isVerified: true
+      username: 'coffee_connoisseur_alex',
+      displayName: 'Alex Coffee',
+      avatar: 'https://ui-avatars.com/api/?name=Alex+Coffee&background=8BC34A&color=fff&size=100',
+      isVerified: false
     },
-    content: 'Sustainable fashion haul! 🌱✨ These pieces are not only stylish but also eco-friendly. Supporting brands that care about our planet 💚 #SustainableFashion #EcoFriendly #Style',
-    media: [
-      'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=600&h=400&fit=crop',
-      'https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?w=600&h=400&fit=crop'
-    ],
-    timestamp: '4 hours ago',
-    likes: 892,
-    comments: 67,
-    shares: 23,
-    bookmarks: 145,
+    content: 'My morning ritual just got an upgrade! ☕️✨ This espresso machine creates café-quality drinks at home. The milk frother is incredible - perfect latte art every time! #CoffeeLovers #LatteArt #MorningRitual',
+    media: ['https://picsum.photos/600/400?random=22', 'https://picsum.photos/600/400?random=23'],
+    timestamp: '5 hours ago',
+    likes: 634,
+    comments: 42,
+    shares: 19,
+    bookmarks: 87,
     isLiked: true,
     isBookmarked: false,
-    hashtags: ['#SustainableFashion', '#EcoFriendly', '#Style']
+    hashtags: ['#CoffeeLovers', '#LatteArt', '#MorningRitual'],
+    product: {
+      id: '2',
+      name: 'Professional Espresso Machine',
+      price: 599.99,
+      image: 'https://picsum.photos/300/300?random=24',
+      description: 'Barista-quality espresso maker for home use',
+      rating: 4.9,
+      reviewCount: 567,
+      brand: 'BrewMaster',
+      inStock: true
+    }
+  },
+  {
+    id: '3',
+    user: {
+      id: '3',
+      username: 'travel_nomad_luna',
+      displayName: 'Luna Wanderlust',
+      avatar: 'https://ui-avatars.com/api/?name=Luna+Wanderlust&background=FF9800&color=fff&size=100',
+      isVerified: true
+    },
+    content: 'Essential travel gear that actually makes a difference! 🎒✈️ This backpack has saved my back on countless adventures. Smart compartments, weather-resistant, and TSA-friendly. Worth every penny! #TravelGear #DigitalNomad #Backpacking',
+    media: ['https://picsum.photos/600/400?random=25'],
+    timestamp: '8 hours ago',
+    likes: 1123,
+    comments: 95,
+    shares: 67,
+    bookmarks: 203,
+    isLiked: false,
+    isBookmarked: true,
+    hashtags: ['#TravelGear', '#DigitalNomad', '#Backpacking'],
+    product: {
+      id: '3',
+      name: 'Adventure Pro Travel Backpack',
+      price: 179.99,
+      image: 'https://picsum.photos/300/300?random=26',
+      description: 'Ultimate travel companion for modern nomads',
+      rating: 4.8,
+      reviewCount: 2156,
+      brand: 'WanderPack',
+      inStock: true
+    }
+  },
+  {
+    id: '4',
+    user: {
+      id: '4',
+      username: 'plant_parent_zoe',
+      displayName: 'Zoe Green',
+      avatar: 'https://ui-avatars.com/api/?name=Zoe+Green&background=2E7D32&color=fff&size=100',
+      isVerified: false
+    },
+    content: 'My indoor garden is thriving! 🌿🌱 These smart plant sensors have been a game-changer. They monitor soil moisture, light levels, and send alerts to my phone. Perfect for busy plant parents! #PlantParent #SmartGardening #IndoorPlants',
+    media: [
+      'https://picsum.photos/600/400?random=27',
+      'https://picsum.photos/600/400?random=28'
+    ],
+    timestamp: '6 hours ago',
+    likes: 743,
+    comments: 52,
+    shares: 31,
+    bookmarks: 98,
+    isLiked: false,
+    isBookmarked: true,
+    hashtags: ['#PlantParent', '#SmartGardening', '#IndoorPlants'],
+    product: {
+      id: '4',
+      name: 'Smart Plant Monitoring System',
+      price: 89.99,
+      image: 'https://picsum.photos/300/300?random=29',
+      description: 'Keep your plants happy with smart monitoring',
+      rating: 4.6,
+      reviewCount: 892,
+      brand: 'GreenTech',
+      inStock: true
+    }
+  },
+  {
+    id: '5',
+    user: {
+      id: '5',
+      username: 'chef_marco_italian',
+      displayName: 'Marco Rossi',
+      avatar: 'https://ui-avatars.com/api/?name=Marco+Rossi&background=D32F2F&color=fff&size=100',
+      isVerified: true
+    },
+    content: 'Authentic pasta night! 🍝🇮🇹 This pasta maker brings the taste of Italy to my kitchen. Fresh noodles make all the difference - the texture and flavor are incredible! Nonna would be proud 😊 #PastaNight #ItalianCooking #HomeMade',
+    media: ['https://picsum.photos/600/400?random=30'],
+    timestamp: '1 day ago',
+    likes: 1456,
+    comments: 128,
+    shares: 89,
+    bookmarks: 267,
+    isLiked: true,
+    isBookmarked: false,
+    hashtags: ['#PastaNight', '#ItalianCooking', '#HomeMade'],
+    product: {
+      id: '5',
+      name: 'Authentic Italian Pasta Maker',
+      price: 249.99,
+      image: 'https://picsum.photos/300/300?random=31',
+      description: 'Professional-grade pasta maker for home chefs',
+      rating: 4.9,
+      reviewCount: 1643,
+      brand: 'PastaVera',
+      inStock: true
+    }
   }
 ];
 

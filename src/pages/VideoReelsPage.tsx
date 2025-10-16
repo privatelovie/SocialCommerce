@@ -60,19 +60,24 @@ const VideoReelsPage: React.FC = () => {
       title: backendVideo.title,
       description: backendVideo.description,
       creator: {
-        id: backendVideo.creator.id,
-        username: backendVideo.creator.username,
-        displayName: backendVideo.creator.displayName,
-        avatar: backendVideo.creator.avatar,
-        isVerified: backendVideo.creator.isVerified,
-        followers: backendVideo.creator.followers,
+        id: backendVideo.creator?.id || 'unknown',
+        username: backendVideo.creator?.username || 'unknown',
+        displayName: backendVideo.creator?.displayName || 'Unknown User',
+        avatar: backendVideo.creator?.avatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face',
+        isVerified: backendVideo.creator?.isVerified || false,
+        followers: backendVideo.creator?.followers || 0,
       },
-      stats: backendVideo.stats,
+      stats: {
+        views: backendVideo.stats?.views || 0,
+        likes: backendVideo.stats?.likes || 0,
+        comments: backendVideo.stats?.comments || 0,
+        shares: backendVideo.stats?.shares || 0,
+      },
       product: backendVideo.product,
-      hashtags: backendVideo.hashtags,
-      isLiked: backendVideo.isLiked,
-      duration: backendVideo.duration,
-      createdAt: new Date(backendVideo.createdAt),
+      hashtags: backendVideo.hashtags || [],
+      isLiked: backendVideo.isLiked || false,
+      duration: backendVideo.duration || 0,
+      createdAt: new Date(backendVideo.createdAt || Date.now()),
     };
   };
 
@@ -88,7 +93,7 @@ const VideoReelsPage: React.FC = () => {
         id: '2',
         username: 'sarah_style',
         displayName: 'Sarah Johnson',
-        avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face',
+        avatar: 'https://ui-avatars.com/api/?name=Sarah+Johnson&background=E91E63&color=fff&size=100',
         isVerified: true,
         followers: 125000
       },
@@ -103,7 +108,7 @@ const VideoReelsPage: React.FC = () => {
         name: 'Bohemian Summer Dress',
         price: 89.99,
         originalPrice: 120.00,
-        image: 'https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?w=300&h=300&fit=crop',
+        image: 'https://picsum.photos/300/300?random=11',
         brand: 'Summer Breeze'
       },
       hashtags: ['#summervibes', '#fashionhaul', '#ootd', '#beachstyle'],
@@ -121,7 +126,7 @@ const VideoReelsPage: React.FC = () => {
         id: '3',
         username: 'tech_mike',
         displayName: 'Mike Chen',
-        avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face',
+        avatar: 'https://ui-avatars.com/api/?name=Mike+Chen&background=0D8ABC&color=fff&size=100',
         isVerified: true,
         followers: 89000
       },
@@ -135,7 +140,7 @@ const VideoReelsPage: React.FC = () => {
         id: 'p2',
         name: 'Wireless Earbuds Pro',
         price: 199.99,
-        image: 'https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=300&h=300&fit=crop',
+        image: 'https://picsum.photos/300/300?random=12',
         brand: 'TechSound'
       },
       hashtags: ['#techreview', '#unboxing', '#gadgets', '#wireless'],
@@ -153,7 +158,7 @@ const VideoReelsPage: React.FC = () => {
         id: '4',
         username: 'fit_anna',
         displayName: 'Anna Fitness',
-        avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face',
+        avatar: 'https://ui-avatars.com/api/?name=Anna+Fitness&background=4CAF50&color=fff&size=100',
         isVerified: false,
         followers: 45000
       },
@@ -168,7 +173,7 @@ const VideoReelsPage: React.FC = () => {
         name: 'Yoga Mat Premium',
         price: 49.99,
         originalPrice: 69.99,
-        image: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=300&h=300&fit=crop',
+        image: 'https://picsum.photos/300/300?random=13',
         brand: 'FitLife'
       },
       hashtags: ['#homeworkout', '#fitness', '#yoga', '#healthy'],
@@ -186,7 +191,7 @@ const VideoReelsPage: React.FC = () => {
         id: '5',
         username: 'nomad_life',
         displayName: 'Travel Nomad',
-        avatar: 'https://images.unsplash.com/photo-1507652313519-d4e9174996dd?w=100&h=100&fit=crop&crop=face',
+        avatar: 'https://ui-avatars.com/api/?name=Travel+Nomad&background=FF9800&color=fff&size=100',
         isVerified: true,
         followers: 78000
       },
@@ -200,7 +205,7 @@ const VideoReelsPage: React.FC = () => {
         id: 'p4',
         name: 'Travel Backpack 40L',
         price: 129.99,
-        image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=300&h=300&fit=crop',
+        image: 'https://picsum.photos/300/300?random=14',
         brand: 'WanderPack'
       },
       hashtags: ['#travel', '#digitalnomad', '#backpack', '#adventure'],
@@ -218,7 +223,7 @@ const VideoReelsPage: React.FC = () => {
         id: '6',
         username: 'beauty_guru',
         displayName: 'Beauty Guru',
-        avatar: 'https://images.unsplash.com/photo-1489424731084-a5d8b219a5bb?w=100&h=100&fit=crop&crop=face',
+        avatar: 'https://ui-avatars.com/api/?name=Beauty+Guru&background=E91E63&color=fff&size=100',
         isVerified: true,
         followers: 156000
       },
@@ -233,7 +238,7 @@ const VideoReelsPage: React.FC = () => {
         name: 'Vitamin C Serum',
         price: 34.99,
         originalPrice: 45.99,
-        image: 'https://images.unsplash.com/photo-1570554886111-e80fcac3c4c6?w=300&h=300&fit=crop',
+        image: 'https://picsum.photos/300/300?random=15',
         brand: 'GlowSkin'
       },
       hashtags: ['#skincare', '#glowup', '#beauty', '#routine'],

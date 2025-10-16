@@ -57,7 +57,7 @@ interface UserSearchResult extends MessagingUser {
   isFollowing?: boolean;
   isFollowedBy?: boolean;
   lastActive?: string;
-  isOnline?: boolean;
+  isOnline: boolean; // Make required to match MessagingUser
 }
 
 interface GroupChatData {
@@ -178,7 +178,7 @@ const NewChatDialog: React.FC<NewChatDialogProps> = ({
       
       const conversationData: CreateConversationData = {
         type: 'direct',
-        participants: [user.id],
+        participantIds: [user.id],
       };
       
       const response = await messagingService.createConversation(conversationData);
@@ -207,10 +207,9 @@ const NewChatDialog: React.FC<NewChatDialogProps> = ({
       
       const conversationData: CreateConversationData = {
         type: 'group',
-        participants: groupChatData.participants.map(p => p.id),
+        participantIds: groupChatData.participants.map(p => p.id),
         groupName: groupChatData.name,
-        groupDescription: groupChatData.description,
-        isPrivate: groupChatData.isPrivate,
+        groupAvatar: groupChatData.description,
       };
       
       const response = await messagingService.createConversation(conversationData);

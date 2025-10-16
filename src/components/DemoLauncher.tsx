@@ -2,11 +2,11 @@ import React from 'react';
 import {
   Box,
   Container,
-  Typography,
-  Button,
+  Grid,
   Card,
   CardContent,
-  Grid,
+  Typography,
+  Button,
   Chip,
   Avatar,
   Stack
@@ -106,7 +106,7 @@ const DemoLauncher: React.FC<DemoLauncherProps> = ({ onLaunchReels, onLaunchApp,
           {/* Demo Cards */}
           <Grid container spacing={3} sx={{ mb: 6 }}>
             {/* Reels Demo Card */}
-            <Grid item xs={12} md={6} lg={3} component="div">
+        <Grid item xs={12} sm={6} md={4} component="div">
               <motion.div
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
@@ -189,7 +189,7 @@ const DemoLauncher: React.FC<DemoLauncherProps> = ({ onLaunchReels, onLaunchApp,
             </Grid>
 
             {/* Messaging Demo Card */}
-            <Grid item xs={12} md={6} lg={3} component="div">
+        <Grid item xs={12} sm={6} md={4} component="div">
               <motion.div
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
@@ -273,7 +273,7 @@ const DemoLauncher: React.FC<DemoLauncherProps> = ({ onLaunchReels, onLaunchApp,
             </Grid>
 
             {/* Explore Demo Card */}
-            <Grid item xs={12} md={6} lg={3} component="div">
+        <Grid item xs={12} sm={6} md={4} component="div">
               <motion.div
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
@@ -357,7 +357,7 @@ const DemoLauncher: React.FC<DemoLauncherProps> = ({ onLaunchReels, onLaunchApp,
             </Grid>
 
             {/* Full App Demo Card */}
-            <Grid item xs={12} md={6} lg={3} component="div">
+        <Grid item xs={12} sm={6} md={4} component="div">
               <motion.div
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
@@ -448,23 +448,23 @@ const DemoLauncher: React.FC<DemoLauncherProps> = ({ onLaunchReels, onLaunchApp,
               ✨ Platform Highlights
             </Typography>
             <Grid container spacing={4} sx={{ maxWidth: 1000, mx: 'auto' }}>
-              <Grid item xs={6} md={2.4} component="div">
+          <Grid item xs={12} md={6} component="div">
                 <Typography variant="h4" fontWeight="bold" sx={{ color: 'white' }}>📱</Typography>
                 <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.8)' }}>Video Reels</Typography>
               </Grid>
-              <Grid item xs={6} md={2.4} component="div">
+          <Grid item xs={12} md={3} component="div">
                 <Typography variant="h4" fontWeight="bold" sx={{ color: 'white' }}>💬</Typography>
                 <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.8)' }}>Live Messaging</Typography>
               </Grid>
-              <Grid item xs={6} md={2.4} component="div">
+          <Grid item xs={12} md={3} component="div">
                 <Typography variant="h4" fontWeight="bold" sx={{ color: 'white' }}>🛒</Typography>
                 <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.8)' }}>Smart Commerce</Typography>
               </Grid>
-              <Grid item xs={6} md={2.4} component="div">
+          <Grid item xs={6} md={3} component="div">
                 <Typography variant="h4" fontWeight="bold" sx={{ color: 'white' }}>🔔</Typography>
                 <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.8)' }}>Real-time Alerts</Typography>
               </Grid>
-              <Grid item xs={6} md={2.4} component="div">
+          <Grid item xs={6} md={3} component="div">
                 <Typography variant="h4" fontWeight="bold" sx={{ color: 'white' }}>🤖</Typography>
                 <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.8)' }}>AI Powered</Typography>
               </Grid>

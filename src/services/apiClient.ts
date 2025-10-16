@@ -1,5 +1,6 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { apiConfig, endpoints, getHeaders, addAuthHeader, handleAuthError } from '../config/api';
+import { mockApiService } from './mockApiService';
 
 // API Response types
 export interface ApiResponse<T = any> {
@@ -126,7 +127,10 @@ class ApiClient {
 
   private async retryRequest<T>(
     requestFn: () => Promise<AxiosResponse<ApiResponse<T>>>,
-    config: Partial<RetryConfig> = {}
+    config: Partial<RetryConfig> = {},
+    endpoint?: string,
+    method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' = 'GET',
+    requestData?: any
   ): Promise<ApiResponse<T>> {
     const { retries, retryCondition, retryDelay } = { ...this.defaultRetryConfig, ...config };
     let lastError: any;
@@ -149,13 +153,46 @@ class ApiClient {
       }
     }
 
+    // If all retries failed and it's a network error, try mock service
+    const isNetworkError = lastError.code === 'NETWORK_ERROR' || 
+                          !lastError.response ||
+                          (lastError.response && lastError.response.status >= 500);
+
+    if (isNetworkError && endpoint) {
+      console.warn(`[Mock Fallback] Backend unavailable, using mock service for ${method} ${endpoint}`);
+      
+      try {
+        // Extract relative path from endpoint
+        const path = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+        
+        switch (method) {
+          case 'GET':
+            return await mockApiService.get(path);
+          case 'POST':
+            return await mockApiService.post(path, requestData);
+          case 'PUT':
+            return await mockApiService.put(path, requestData);
+          case 'PATCH':
+            return await mockApiService.patch(path, requestData);
+          case 'DELETE':
+            return await mockApiService.delete(path);
+          default:
+            throw lastError;
+        }
+      } catch (mockError) {
+        console.error('[Mock Service Error]', mockError);
+        // If mock service also fails, throw original error
+        throw lastError;
+      }
+    }
+
     throw lastError;
   }
 
   // Generic request methods
   async get<T = any>(url: string, config?: AxiosRequestConfig & { retry?: Partial<RetryConfig> }): Promise<ApiResponse<T>> {
     const { retry, ...axiosConfig } = config || {};
-    return this.retryRequest(() => this.client.get(url, axiosConfig), retry);
+    return this.retryRequest(() => this.client.get(url, axiosConfig), retry, url, 'GET');
   }
 
   async post<T = any>(
@@ -164,7 +201,7 @@ class ApiClient {
     config?: AxiosRequestConfig & { retry?: Partial<RetryConfig> }
   ): Promise<ApiResponse<T>> {
     const { retry, ...axiosConfig } = config || {};
-    return this.retryRequest(() => this.client.post(url, data, axiosConfig), retry);
+    return this.retryRequest(() => this.client.post(url, data, axiosConfig), retry, url, 'POST', data);
   }
 
   async put<T = any>(
@@ -173,7 +210,7 @@ class ApiClient {
     config?: AxiosRequestConfig & { retry?: Partial<RetryConfig> }
   ): Promise<ApiResponse<T>> {
     const { retry, ...axiosConfig } = config || {};
-    return this.retryRequest(() => this.client.put(url, data, axiosConfig), retry);
+    return this.retryRequest(() => this.client.put(url, data, axiosConfig), retry, url, 'PUT', data);
   }
 
   async patch<T = any>(
@@ -182,12 +219,12 @@ class ApiClient {
     config?: AxiosRequestConfig & { retry?: Partial<RetryConfig> }
   ): Promise<ApiResponse<T>> {
     const { retry, ...axiosConfig } = config || {};
-    return this.retryRequest(() => this.client.patch(url, data, axiosConfig), retry);
+    return this.retryRequest(() => this.client.patch(url, data, axiosConfig), retry, url, 'PATCH', data);
   }
 
   async delete<T = any>(url: string, config?: AxiosRequestConfig & { retry?: Partial<RetryConfig> }): Promise<ApiResponse<T>> {
     const { retry, ...axiosConfig } = config || {};
-    return this.retryRequest(() => this.client.delete(url, axiosConfig), retry);
+    return this.retryRequest(() => this.client.delete(url, axiosConfig), retry, url, 'DELETE');
   }
 
   // Specialized methods for file uploads
@@ -239,8 +276,8 @@ class ApiClient {
         data: data as T[],
         metadata: {
           total: results.length,
-          successful: results.filter(r => r.status === 'fulfilled').length,
-          failed: results.filter(r => r.status === 'rejected').length,
+          // successful: results.filter(r => r.status === 'fulfilled').length,
+          // failed: results.filter(r => r.status === 'rejected').length,
         }
       };
     } catch (error) {
@@ -292,11 +329,11 @@ class ApiClient {
   clearCache(pattern?: string) {
     if (pattern) {
       const regex = new RegExp(pattern);
-      for (const key of this.cache.keys()) {
+      Array.from(this.cache.keys()).forEach(key => {
         if (regex.test(key)) {
           this.cache.delete(key);
         }
-      }
+      });
     } else {
       this.cache.clear();
     }
@@ -319,7 +356,7 @@ export const apiClient = new ApiClient();
 // Export endpoints for easy access
 export { endpoints };
 
-// Export types
-export type { ApiResponse, ApiError, RetryConfig };
+// Export additional types
+export type { RetryConfig };
 
 export default apiClient;

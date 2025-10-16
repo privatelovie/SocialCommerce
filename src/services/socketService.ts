@@ -1,5 +1,7 @@
 import { EventEmitter } from 'events';
-import { io, Socket } from 'socket.io-client';
+import io from 'socket.io-client';
+// Define Socket type inline to avoid import issues
+type SocketType = any;
 
 interface SocketConfig {
   url: string;
@@ -7,8 +9,8 @@ interface SocketConfig {
 }
 
 class SocketService extends EventEmitter {
-  private socket: Socket | null = null;
-  private isConnected: boolean = false;
+  private socket: SocketType | null = null;
+  private _isConnected: boolean = false;
   private reconnectAttempts: number = 0;
   private maxReconnectAttempts: number = 5;
   private reconnectInterval: number = 1000;
@@ -34,7 +36,7 @@ class SocketService extends EventEmitter {
   connect(token?: string): Promise<void> {
     return new Promise((resolve, reject) => {
       try {
-        if (this.socket && this.isConnected) {
+        if (this.socket && this._isConnected) {
           resolve();
           return;
         }
@@ -47,16 +49,16 @@ class SocketService extends EventEmitter {
         this.socket = io(this.config.url, options);
 
         this.socket.on('connect', () => {
-          this.isConnected = true;
+          this._isConnected = true;
           this.reconnectAttempts = 0;
-          this.emit('connected');
+          super.emit('connected');
           console.log('Socket connected');
           resolve();
         });
 
-        this.socket.on('disconnect', (reason) => {
-          this.isConnected = false;
-          this.emit('disconnected', reason);
+        this.socket.on('disconnect', (reason: any) => {
+          this._isConnected = false;
+          super.emit('disconnected', reason);
           console.log('Socket disconnected:', reason);
           
           if (reason === 'io server disconnect') {
@@ -65,17 +67,17 @@ class SocketService extends EventEmitter {
           }
         });
 
-        this.socket.on('connect_error', (error) => {
-          this.isConnected = false;
+        this.socket.on('connect_error', (error: any) => {
+          this._isConnected = false;
           console.error('Socket connection error:', error);
-          this.emit('connectionError', error);
+          super.emit('connectionError', error);
           this.handleReconnect();
           reject(error);
         });
 
-        this.socket.on('error', (error) => {
+        this.socket.on('error', (error: any) => {
           console.error('Socket error:', error);
-          this.emit('error', error);
+          super.emit('error', error);
         });
 
         // Set up event forwarding
@@ -92,8 +94,8 @@ class SocketService extends EventEmitter {
     if (this.socket) {
       this.socket.disconnect();
       this.socket = null;
-      this.isConnected = false;
-      this.emit('disconnected', 'client_disconnect');
+      this._isConnected = false;
+      super.emit('disconnected', 'client_disconnect');
     }
   }
 
@@ -124,15 +126,15 @@ class SocketService extends EventEmitter {
     ];
 
     events.forEach(eventName => {
-      this.socket!.on(eventName, (data) => {
-        this.emit(eventName, data);
+      this.socket!.on(eventName, (data: any) => {
+        super.emit(eventName, data);
       });
     });
   }
 
   // Send events to server
-  emit(eventName: string, data?: any): void {
-    if (this.socket && this.isConnected) {
+  emitToSocket(eventName: string, data?: any): void {
+    if (this.socket && this._isConnected) {
       this.socket.emit(eventName, data);
     } else {
       console.warn('Socket not connected, cannot emit:', eventName);
@@ -143,7 +145,7 @@ class SocketService extends EventEmitter {
   private handleReconnect(): void {
     if (this.reconnectAttempts >= this.maxReconnectAttempts) {
       console.error('Max reconnection attempts reached');
-      this.emit('reconnectionFailed');
+      super.emit('reconnectionFailed');
       return;
     }
 
@@ -153,7 +155,7 @@ class SocketService extends EventEmitter {
     console.log(`Attempting to reconnect... (${this.reconnectAttempts}/${this.maxReconnectAttempts})`);
     
     setTimeout(() => {
-      if (!this.isConnected) {
+      if (!this._isConnected) {
         this.connect();
       }
     }, delay);
@@ -161,21 +163,21 @@ class SocketService extends EventEmitter {
 
   // Room management
   joinRoom(room: string): void {
-    this.emit('join', { room });
+    this.emitToSocket('join', { room });
   }
 
   leaveRoom(room: string): void {
-    this.emit('leave', { room });
+    this.emitToSocket('leave', { room });
   }
 
   // Authentication
   authenticate(token: string): void {
-    this.emit('authenticate', { token });
+    this.emitToSocket('authenticate', { token });
   }
 
   // User presence
   updatePresence(status: 'online' | 'away' | 'busy' | 'offline'): void {
-    this.emit('updatePresence', { status });
+    this.emitToSocket('updatePresence', { status });
   }
 
   // Messaging events
@@ -189,38 +191,38 @@ class SocketService extends EventEmitter {
 
   // Typing indicators
   startTyping(conversationId: string): void {
-    this.emit('typing', { conversationId, typing: true });
+    this.emitToSocket('typing', { conversationId, typing: true });
   }
 
   stopTyping(conversationId: string): void {
-    this.emit('typing', { conversationId, typing: false });
+    this.emitToSocket('typing', { conversationId, typing: false });
   }
 
   // Notifications
   markNotificationRead(notificationId: string): void {
-    this.emit('markNotificationRead', { notificationId });
+    this.emitToSocket('markNotificationRead', { notificationId });
   }
 
   markAllNotificationsRead(): void {
-    this.emit('markAllNotificationsRead');
+    this.emitToSocket('markAllNotificationsRead');
   }
 
   deleteNotification(notificationId: string): void {
-    this.emit('deleteNotification', { notificationId });
+    this.emitToSocket('deleteNotification', { notificationId });
   }
 
   clearAllNotifications(): void {
-    this.emit('clearAllNotifications');
+    this.emitToSocket('clearAllNotifications');
   }
 
   // Status getters
   isConnected(): boolean {
-    return this.isConnected && this.socket !== null;
+    return this._isConnected && this.socket !== null;
   }
 
   getConnectionState(): 'connected' | 'connecting' | 'disconnected' {
     if (!this.socket) return 'disconnected';
-    if (this.isConnected) return 'connected';
+    if (this._isConnected) return 'connected';
     return 'connecting';
   }
 

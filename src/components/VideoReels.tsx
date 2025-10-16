@@ -399,7 +399,7 @@ const VideoReels: React.FC<VideoReelsProps> = ({
               {currentVideo.isLiked ? <Favorite /> : <FavoriteBorder />}
             </IconButton>
             <Typography variant="caption" color="white" display="block">
-              {formatNumber(currentVideo.stats.likes)}
+              {formatNumber(currentVideo.stats?.likes || 0)}
             </Typography>
           </Box>
         </motion.div>
@@ -420,7 +420,7 @@ const VideoReels: React.FC<VideoReelsProps> = ({
               <Comment />
             </IconButton>
             <Typography variant="caption" color="white" display="block">
-              {formatNumber(currentVideo.stats.comments)}
+              {formatNumber(currentVideo.stats?.comments || 0)}
             </Typography>
           </Box>
         </motion.div>
@@ -441,7 +441,7 @@ const VideoReels: React.FC<VideoReelsProps> = ({
               <Share />
             </IconButton>
             <Typography variant="caption" color="white" display="block">
-              {formatNumber(currentVideo.stats.shares)}
+              {formatNumber(currentVideo.stats?.shares || 0)}
             </Typography>
           </Box>
         </motion.div>
@@ -486,7 +486,7 @@ const VideoReels: React.FC<VideoReelsProps> = ({
         {/* Creator Info */}
         <Box display="flex" alignItems="center" gap={2} mb={2}>
           <Typography variant="h6" fontWeight="bold">
-            @{currentVideo.creator.username}
+            @{currentVideo.creator?.username || 'Unknown'}
           </Typography>
           {currentVideo.creator.isVerified && (
             <Verified sx={{ fontSize: '18px', color: '#1da1f2' }} />
@@ -516,7 +516,7 @@ const VideoReels: React.FC<VideoReelsProps> = ({
 
         {/* Hashtags */}
         <Box display="flex" gap={1} flexWrap="wrap" mb={2}>
-          {currentVideo.hashtags.map((hashtag, index) => (
+          {(currentVideo.hashtags || []).map((hashtag, index) => (
             <Chip
               key={index}
               label={hashtag}
@@ -535,7 +535,7 @@ const VideoReels: React.FC<VideoReelsProps> = ({
           <Box display="flex" alignItems="center" gap={0.5}>
             <TrendingUp sx={{ fontSize: '16px' }} />
             <Typography variant="caption">
-              {formatNumber(currentVideo.stats.views)} views
+              {formatNumber(currentVideo.stats?.views || 0)} views
             </Typography>
           </Box>
           <Typography variant="caption" color="rgba(255,255,255,0.7)">

@@ -47,11 +47,11 @@ export interface Cart {
   subtotal: number;
   discount: number;
   tax: number;
-  shipping: number;
+  shippingCost: number;
   total: number;
   currency: string;
   appliedCoupons: AppliedCoupon[];
-  shipping: ShippingDetails;
+  shippingDetails: ShippingDetails;
   estimatedDelivery?: string;
   saveForLater: CartItem[];
   createdAt: string;
@@ -686,7 +686,7 @@ class CartService extends EventEmitter {
     this.cart.subtotal = this.cart.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     
     // Recalculate total (simplified - would be more complex with taxes, shipping, etc.)
-    this.cart.total = this.cart.subtotal - this.cart.discount + this.cart.tax + this.cart.shipping;
+    this.cart.total = this.cart.subtotal - this.cart.discount + this.cart.tax + this.cart.shippingCost;
     
     this.debouncedSync();
   }

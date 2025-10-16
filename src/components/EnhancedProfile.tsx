@@ -146,7 +146,11 @@ const EnhancedProfile: React.FC<EnhancedProfileProps> = ({
         location: 'New York, USA',
         website: 'https://sarahjohnson.com',
         isCreator: true,
-        creatorLevel: 'gold'
+        creatorLevel: 'gold',
+        // Add required User fields
+        followers: 0,
+        following: 0,
+        posts: 0
       });
       setIsFollowing(false);
     }
@@ -254,11 +258,11 @@ const EnhancedProfile: React.FC<EnhancedProfileProps> = ({
     if (isFollowing) {
       await unfollowUser(profileUser.id);
       setIsFollowing(false);
-      setProfileUser(prev => prev ? { ...prev, followerCount: prev.followerCount - 1 } : null);
+      setProfileUser(prev => prev ? { ...prev, followerCount: (prev.followerCount || 0) - 1 } : null);
     } else {
       await followUser(profileUser.id);
       setIsFollowing(true);
-      setProfileUser(prev => prev ? { ...prev, followerCount: prev.followerCount + 1 } : null);
+      setProfileUser(prev => prev ? { ...prev, followerCount: (prev.followerCount || 0) + 1 } : null);
     }
 
     onFollowToggle?.(profileUser.id, !isFollowing);
@@ -315,7 +319,7 @@ const EnhancedProfile: React.FC<EnhancedProfileProps> = ({
               )}
               {profileUser.isCreator && (
                 <Chip
-                  label={profileUser.creatorLevel.toUpperCase()}
+                  label={profileUser.creatorLevel?.toUpperCase() || 'BRONZE'}
                   size="small"
                   color="primary"
                   variant="outlined"

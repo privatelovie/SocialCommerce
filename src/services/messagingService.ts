@@ -1,6 +1,7 @@
 import { apiClient, ApiResponse } from './apiClient';
 import { endpoints } from '../config/api';
-import { Socket } from 'socket.io-client';
+// Define Socket type inline to avoid import issues
+type SocketType = any;
 
 // Message types
 export interface User {
@@ -99,11 +100,11 @@ export interface CreateConversationData {
 }
 
 class MessagingService {
-  private socket: Socket | null = null;
+  private socket: SocketType | null = null;
   private listeners: Map<string, Function[]> = new Map();
 
   // Initialize Socket.IO connection
-  initializeSocket(socket: Socket) {
+  initializeSocket(socket: SocketType) {
     this.socket = socket;
     this.setupSocketListeners();
   }
@@ -183,6 +184,101 @@ class MessagingService {
   }
 
   // API Methods
+  
+  // Get recent contacts
+  async getRecentContacts(): Promise<{
+    success: boolean;
+    users?: User[];
+    error?: string;
+  }> {
+    try {
+      const response: ApiResponse<{ users: User[] }> = await apiClient.getWithCache(
+        '/api/users/recent-contacts',
+        30 * 1000 // 30 seconds cache
+      );
+
+      if (response.success && response.data) {
+        return {
+          success: true,
+          users: response.data.users,
+        };
+      } else {
+        return {
+          success: false,
+          error: response.error || 'Failed to fetch recent contacts',
+        };
+      }
+    } catch (error: any) {
+      console.error('Get recent contacts error:', error);
+      return {
+        success: false,
+        error: error.message || 'Failed to fetch recent contacts',
+      };
+    }
+  }
+
+  // Get suggested users
+  async getSuggestedUsers(): Promise<{
+    success: boolean;
+    users?: User[];
+    error?: string;
+  }> {
+    try {
+      const response: ApiResponse<{ users: User[] }> = await apiClient.getWithCache(
+        '/api/users/suggested',
+        60 * 1000 // 60 seconds cache
+      );
+
+      if (response.success && response.data) {
+        return {
+          success: true,
+          users: response.data.users,
+        };
+      } else {
+        return {
+          success: false,
+          error: response.error || 'Failed to fetch suggested users',
+        };
+      }
+    } catch (error: any) {
+      console.error('Get suggested users error:', error);
+      return {
+        success: false,
+        error: error.message || 'Failed to fetch suggested users',
+      };
+    }
+  }
+
+  // Search users
+  async searchUsers(query: string): Promise<{
+    success: boolean;
+    users?: User[];
+    error?: string;
+  }> {
+    try {
+      const response: ApiResponse<{ users: User[] }> = await apiClient.get(
+        `/api/users/search?q=${encodeURIComponent(query)}`
+      );
+
+      if (response.success && response.data) {
+        return {
+          success: true,
+          users: response.data.users,
+        };
+      } else {
+        return {
+          success: false,
+          error: response.error || 'Failed to search users',
+        };
+      }
+    } catch (error: any) {
+      console.error('Search users error:', error);
+      return {
+        success: false,
+        error: error.message || 'Failed to search users',
+      };
+    }
+  }
   
   // Get conversations list
   async getConversations(page: number = 1, limit: number = 20): Promise<{

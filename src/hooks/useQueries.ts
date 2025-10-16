@@ -29,7 +29,7 @@ type InfiniteQueryOptions<T> = Omit<UseInfiniteQueryOptions<T>, 'queryKey' | 'qu
 export const useUserProfile = (userId?: string, options?: QueryOptions<any>) => {
   return useQuery({
     queryKey: queryKeys.user.profile(userId),
-    queryFn: () => authService.getProfile(userId!),
+    queryFn: () => authService.getProfile(),
     enabled: !!userId,
     staleTime: 1000 * 60 * 5, // 5 minutes
     ...options
@@ -64,7 +64,7 @@ export const useLogin = (options?: MutationOptions<any, { email: string; passwor
   
   return useMutation({
     mutationKey: [mutationKeys.user.login],
-    mutationFn: ({ email, password }) => authService.login(email, password),
+    mutationFn: ({ email, password }) => authService.login({ email, password }),
     onSuccess: () => {
       // Invalidate user queries after successful login
       invalidateQueries.user();

@@ -104,6 +104,7 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({ onClose, onSave }) => {
   const [saveSuccess, setToastOpen] = useState(false);
   const [imageUploadDialog, setImageUploadDialog] = useState<'avatar' | 'cover' | null>(null);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [newInterest, setNewInterest] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Form state
@@ -474,9 +475,8 @@ const ProfileEditor: React.FC<ProfileEditorProps> = ({ onClose, onSave }) => {
     </Box>
   );
 
+
   const renderInterestsTab = () => {
-    const [newInterest, setNewInterest] = useState('');
-    
     const suggestedInterests = [
       'Technology', 'Fashion', 'Travel', 'Food', 'Fitness', 'Photography',
       'Gaming', 'Music', 'Art', 'Books', 'Movies', 'Sports', 'Nature',

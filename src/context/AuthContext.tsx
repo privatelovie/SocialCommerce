@@ -2,7 +2,11 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import { authService, User as AuthUser, LoginCredentials, RegisterData as AuthRegisterData } from '../services/authService';
 import { socketConfig } from '../config/api';
 import { messagingService } from '../services/messagingService';
-import io, { Socket } from 'socket.io-client';
+import io from 'socket.io-client';
+import { Socket } from 'socket.io-client';
+
+// Define Socket type inline to avoid import issues
+type SocketType = any;
 
 // Use the User type from authService but extend it with additional frontend-specific fields
 export interface User extends AuthUser {
@@ -45,7 +49,7 @@ interface AuthContextType {
   updateProfile: (updates: Partial<User>) => Promise<boolean>;
   loading: boolean;
   error: string | null;
-  socket: Socket | null;
+  socket: SocketType | null;
 }
 
 interface RegisterData {
@@ -69,7 +73,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [socket, setSocket] = useState<Socket | null>(null);
+  const [socket, setSocket] = useState<SocketType | null>(null);
 
   // Initialize Socket.IO connection
   const initializeSocket = (userId: string) => {
@@ -93,7 +97,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       console.log('Socket disconnected');
     });
 
-    newSocket.on('connect_error', (error) => {
+    newSocket.on('connect_error', (error: any) => {
       console.error('Socket connection error:', error);
     });
 

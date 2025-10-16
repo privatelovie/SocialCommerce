@@ -103,7 +103,7 @@ const MessagingPage: React.FC<MessagingPageProps> = () => {
   // Refs
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messageInputRef = useRef<HTMLInputElement>(null);
-  const typingTimeoutRef = useRef<NodeJS.Timeout>();
+  const typingTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
 
   // Load conversations on mount
   useEffect(() => {
