@@ -303,6 +303,7 @@ class CartService extends EventEmitter {
       
       return {
         success: false,
+        data: null,
         error: error.response?.data?.error || error.message || 'Failed to fetch cart'
       };
     }
@@ -346,6 +347,7 @@ class CartService extends EventEmitter {
       
       return {
         success: false,
+        data: null,
         error: error.response?.data?.error || error.message || 'Failed to add item to cart'
       };
     }
@@ -380,6 +382,7 @@ class CartService extends EventEmitter {
       
       return {
         success: false,
+        data: null,
         error: error.response?.data?.error || error.message || 'Failed to update cart item'
       };
     }
@@ -410,6 +413,7 @@ class CartService extends EventEmitter {
       
       return {
         success: false,
+        data: null,
         error: error.response?.data?.error || error.message || 'Failed to remove item from cart'
       };
     }
@@ -430,6 +434,7 @@ class CartService extends EventEmitter {
     } catch (error: any) {
       return {
         success: false,
+        data: null,
         error: error.response?.data?.error || error.message || 'Failed to clear cart'
       };
     }
@@ -451,6 +456,7 @@ class CartService extends EventEmitter {
     } catch (error: any) {
       return {
         success: false,
+        data: null,
         error: error.response?.data?.error || error.message || 'Failed to save item for later'
       };
     }
@@ -471,6 +477,7 @@ class CartService extends EventEmitter {
     } catch (error: any) {
       return {
         success: false,
+        data: null,
         error: error.response?.data?.error || error.message || 'Failed to move item to cart'
       };
     }
@@ -510,6 +517,7 @@ class CartService extends EventEmitter {
     } catch (error: any) {
       return {
         success: false,
+        data: null,
         error: error.response?.data?.error || error.message || 'Failed to remove coupon'
       };
     }
@@ -543,6 +551,7 @@ class CartService extends EventEmitter {
     } catch (error: any) {
       return {
         success: false,
+        data: null,
         error: error.response?.data?.error || error.message || 'Failed to select shipping option'
       };
     }
@@ -643,6 +652,7 @@ class CartService extends EventEmitter {
     } catch (error: any) {
       return {
         success: false,
+        data: null,
         error: error.response?.data?.error || error.message || 'Failed to move wishlist item to cart'
       };
     }
