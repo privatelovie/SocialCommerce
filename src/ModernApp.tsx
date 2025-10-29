@@ -44,7 +44,6 @@ import CartDrawer from './components/CartDrawer';
 import AIGuide from './components/AIGuide';
 import VideoReelsPage from './pages/VideoReelsPage';
 import MessagingPage from './pages/MessagingPage';
-import DemoLauncher from './components/DemoLauncher';
 import DirectMessages from './components/DirectMessages';
 import EnhancedProfile from './components/EnhancedProfile';
 import AnalyticsDashboard from './components/AnalyticsDashboard';
@@ -54,6 +53,8 @@ import ProductPage from './components/ProductPage';
 import UserSearch from './components/UserSearch';
 import HashtagExplorer from './components/HashtagExplorer';
 import ProfileEditor from './components/ProfileEditor';
+import GoogleAuthProviderWrapper from './components/GoogleAuthProvider';
+import GoogleLoginButton from './components/GoogleLoginButton';
 
 // Pages
 import ExplorePage from './pages/ExplorePage';
@@ -61,8 +62,12 @@ import ExplorePage from './pages/ExplorePage';
 // Services
 import demoRealProducts from './services/demoRealProducts';
 
+// Utils
+import { getProductImage, getUserAvatar } from './utils/productImages';
+
 // Styles
 import './styles/modern.css';
+import './styles/mobile.css';
 
 
 // Mock Social Posts
@@ -73,11 +78,11 @@ const mockSocialPosts = [
       id: '1',
       username: 'fitness_guru_mike',
       displayName: 'Mike Fitness',
-      avatar: 'https://ui-avatars.com/api/?name=Mike+Fitness&background=4CAF50&color=fff&size=100',
+      avatar: getUserAvatar('Mike Fitness'),
       isVerified: true
     },
     content: 'Finally found the perfect home gym setup! 💪🏠 This compact equipment gives me a full-body workout without taking up my entire living room. Game changer for busy schedules! #HomeGym #FitnessMotivation #WorkoutFromHome',
-    media: ['https://picsum.photos/600/400?random=20'],
+    media: [getProductImage('fitness', 0)],
     timestamp: '3 hours ago',
     likes: 956,
     comments: 74,
@@ -90,7 +95,7 @@ const mockSocialPosts = [
       id: '1',
       name: 'Compact Home Gym System',
       price: 399.99,
-      image: 'https://picsum.photos/300/300?random=21',
+      image: getProductImage('fitness', 0),
       description: 'Complete home workout solution in minimal space',
       rating: 4.7,
       reviewCount: 1843,
@@ -104,11 +109,11 @@ const mockSocialPosts = [
       id: '2',
       username: 'coffee_connoisseur_alex',
       displayName: 'Alex Coffee',
-      avatar: 'https://ui-avatars.com/api/?name=Alex+Coffee&background=8BC34A&color=fff&size=100',
+      avatar: getUserAvatar('Alex Coffee'),
       isVerified: false
     },
     content: 'My morning ritual just got an upgrade! ☕️✨ This espresso machine creates café-quality drinks at home. The milk frother is incredible - perfect latte art every time! #CoffeeLovers #LatteArt #MorningRitual',
-    media: ['https://picsum.photos/600/400?random=22', 'https://picsum.photos/600/400?random=23'],
+    media: [getProductImage('home', 0), getProductImage('home', 1)],
     timestamp: '5 hours ago',
     likes: 634,
     comments: 42,
@@ -121,7 +126,7 @@ const mockSocialPosts = [
       id: '2',
       name: 'Professional Espresso Machine',
       price: 599.99,
-      image: 'https://picsum.photos/300/300?random=24',
+      image: getProductImage('home', 2),
       description: 'Barista-quality espresso maker for home use',
       rating: 4.9,
       reviewCount: 567,
@@ -135,11 +140,11 @@ const mockSocialPosts = [
       id: '3',
       username: 'travel_nomad_luna',
       displayName: 'Luna Wanderlust',
-      avatar: 'https://ui-avatars.com/api/?name=Luna+Wanderlust&background=FF9800&color=fff&size=100',
+      avatar: getUserAvatar('Luna Wanderlust'),
       isVerified: true
     },
     content: 'Essential travel gear that actually makes a difference! 🎒✈️ This backpack has saved my back on countless adventures. Smart compartments, weather-resistant, and TSA-friendly. Worth every penny! #TravelGear #DigitalNomad #Backpacking',
-    media: ['https://picsum.photos/600/400?random=25'],
+    media: [getProductImage('fashion', 4)],
     timestamp: '8 hours ago',
     likes: 1123,
     comments: 95,
@@ -152,7 +157,7 @@ const mockSocialPosts = [
       id: '3',
       name: 'Adventure Pro Travel Backpack',
       price: 179.99,
-      image: 'https://picsum.photos/300/300?random=26',
+      image: getProductImage('fashion', 4),
       description: 'Ultimate travel companion for modern nomads',
       rating: 4.8,
       reviewCount: 2156,
@@ -239,6 +244,7 @@ const AuthModal: React.FC<{
   const [password, setPassword] = useState('');
   const [username, setUsername] = useState('');
   const [displayName, setDisplayName] = useState('');
+  const [authError, setAuthError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -335,9 +341,9 @@ const AuthModal: React.FC<{
             }}
           />
           
-          {error && (
+          {(error || authError) && (
             <Alert severity="error" sx={{ mb: 2 }}>
-              {error}
+              {error || authError}
             </Alert>
           )}
           
@@ -350,14 +356,29 @@ const AuthModal: React.FC<{
             sx={{
               py: 1.5,
               mb: 2,
-              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              background: 'linear-gradient(135deg, #1976d2 0%, #115293 100%)',
               '&:hover': {
-                background: 'linear-gradient(135deg, #5a67d8 0%, #6b5b95 100%)',
+                background: 'linear-gradient(135deg, #115293 0%, #0d3c6b 100%)',
               },
             }}
           >
             {loading ? 'Loading...' : type === 'login' ? 'Sign In' : 'Create Account'}
           </Button>
+          
+          {type === 'login' && (
+            <>
+              <Box sx={{ display: 'flex', alignItems: 'center', my: 2 }}>
+                <Box sx={{ flex: 1, borderBottom: '1px solid #e2e8f0' }} />
+                <Typography sx={{ mx: 2, color: 'text.secondary' }}>or</Typography>
+                <Box sx={{ flex: 1, borderBottom: '1px solid #e2e8f0' }} />
+              </Box>
+              
+              <GoogleLoginButton
+                onSuccess={onClose}
+                onError={(error) => setAuthError(error)}
+              />
+            </>
+          )}
           
           <Button
             variant="text"
@@ -385,6 +406,7 @@ const AppContent: React.FC = () => {
   const [posts, setPosts] = useState(mockSocialPosts);
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [authModalType, setAuthModalType] = useState<'login' | 'register'>('login');
+  const [searchQuery, setSearchQuery] = useState('');
   const [selectedPost, setSelectedPost] = useState<any>(null);
   const [commentsOpen, setCommentsOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
@@ -395,7 +417,7 @@ const AppContent: React.FC = () => {
   const [showUserSearch, setShowUserSearch] = useState(false);
   const [showHashtagExplorer, setShowHashtagExplorer] = useState(false);
   const [showProfileEditor, setShowProfileEditor] = useState(false);
-  const [showDemoLauncher, setShowDemoLauncher] = useState(true);
+  // const [showDemoLauncher, setShowDemoLauncher] = useState(true); // Removed
 
   // Handle navigation
   const handleNavigate = (path: string) => {
@@ -408,8 +430,6 @@ const AppContent: React.FC = () => {
     } else if (path === '/edit-profile' || path === 'edit-profile') {
       setShowProfileEditor(true);
       setCurrentView('edit-profile');
-    } else if (path === 'demo-launcher' || path === '/demo-launcher') {
-      setShowDemoLauncher(true);
     } else {
       setCurrentView(path.replace('/', '') || 'feed');
     }
@@ -480,26 +500,7 @@ const AppContent: React.FC = () => {
     setCurrentView('feed');
   };
 
-  // Demo launcher handlers
-  const handleLaunchReels = () => {
-    setShowDemoLauncher(false);
-    setCurrentView('videos');
-  };
-
-  const handleLaunchApp = () => {
-    setShowDemoLauncher(false);
-    setCurrentView('feed');
-  };
-
-  const handleLaunchMessaging = () => {
-    setShowDemoLauncher(false);
-    setCurrentView('messages');
-  };
-
-  const handleLaunchExplore = () => {
-    setShowDemoLauncher(false);
-    setCurrentView('explore');
-  };
+  // Demo launcher handlers removed - app starts directly in feed
 
   // Landing page for unauthenticated users
   if (!isAuthenticated) {
@@ -511,7 +512,7 @@ const AppContent: React.FC = () => {
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
-          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          background: 'linear-gradient(135deg, #1976d2 0%, #115293 100%)',
           p: 3,
         }}
       >
@@ -549,7 +550,7 @@ const AppContent: React.FC = () => {
                 sx={{
                   px: 4,
                   py: 1.5,
-                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                  background: 'linear-gradient(135deg, #1976d2 0%, #115293 100%)',
                 }}
               >
                 Sign In
@@ -580,17 +581,7 @@ const AppContent: React.FC = () => {
     );
   }
 
-  // Show demo launcher first for authenticated users
-  if (showDemoLauncher) {
-    return (
-      <DemoLauncher
-        onLaunchReels={handleLaunchReels}
-        onLaunchApp={handleLaunchApp}
-        onLaunchMessaging={handleLaunchMessaging}
-        onLaunchExplore={handleLaunchExplore}
-      />
-    );
-  }
+  // App starts directly - no demo launcher needed
 
   // Main authenticated app
   return (
@@ -604,8 +595,8 @@ const AppContent: React.FC = () => {
         currentUser={user!}
         currentView={currentView}
         onViewChange={setCurrentView}
-        searchQuery=""
-        onSearchChange={handleSearch}
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
         cartItemsCount={cartState.totalItems}
         wishlistCount={favoritesState.totalItems}
         notificationsCount={0}
@@ -618,7 +609,7 @@ const AppContent: React.FC = () => {
         maxWidth="xl" 
         sx={{ 
           pt: { xs: 12, md: 8 },
-          pb: { xs: 10, md: 4 },
+          pb: { xs: 12, md: 4 },
           px: { xs: 1, sm: 2, md: 3, lg: 4 },
           minHeight: 'calc(100vh - 140px)'
         }}
@@ -914,29 +905,31 @@ const AppContent: React.FC = () => {
 const ModernApp: React.FC = () => {
   return (
     <ErrorBoundary level="page">
-      <QueryClientProvider client={queryClient}>
-        <CustomThemeProvider>
-          <AuthProvider>
-            <SocialProvider>
-              <CartProvider>
-                <FavoritesProvider>
-                  <ToastProvider>
-                    <Router>
-                      <ErrorBoundary level="section">
-                        <AppContent />
-                      </ErrorBoundary>
-                    </Router>
-                  </ToastProvider>
-                </FavoritesProvider>
-              </CartProvider>
-            </SocialProvider>
-          </AuthProvider>
-        </CustomThemeProvider>
-        {/* React Query DevTools - only in development */}
-        {process.env.NODE_ENV === 'development' && (
-          <ReactQueryDevtools initialIsOpen={false} />
-        )}
-      </QueryClientProvider>
+      <GoogleAuthProviderWrapper>
+        <QueryClientProvider client={queryClient}>
+          <CustomThemeProvider>
+            <AuthProvider>
+              <SocialProvider>
+                <CartProvider>
+                  <FavoritesProvider>
+                    <ToastProvider>
+                      <Router>
+                        <ErrorBoundary level="section">
+                          <AppContent />
+                        </ErrorBoundary>
+                      </Router>
+                    </ToastProvider>
+                  </FavoritesProvider>
+                </CartProvider>
+              </SocialProvider>
+            </AuthProvider>
+          </CustomThemeProvider>
+          {/* React Query DevTools - only in development */}
+          {process.env.NODE_ENV === 'development' && (
+            <ReactQueryDevtools initialIsOpen={false} />
+          )}
+        </QueryClientProvider>
+      </GoogleAuthProviderWrapper>
     </ErrorBoundary>
   );
 };

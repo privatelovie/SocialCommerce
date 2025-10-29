@@ -36,11 +36,13 @@ import {
   DarkMode,
   LightMode,
   VideoLibrary,
-  Message
+  Message,
+  Logout
 } from '@mui/icons-material';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCart } from '../context/CartContext';
 import { useThemeMode } from '../context/ThemeContext';
+import { authAPI } from '../services/api';
 import demoProductService from '../services/demoRealProducts';
 import { OpenProductService } from '../services/productApi';
 import { RealProduct } from '../services/productApi';
@@ -97,6 +99,18 @@ const Navigation: React.FC<NavigationProps> = ({
   const { state: cartState } = useCart();
   const { mode: themeMode, toggleTheme } = useThemeMode();
   const openProductService = useMemo(() => new OpenProductService(), []);
+  
+  const handleLogout = async () => {
+    try {
+      await authAPI.logout();
+      // Redirect to login page
+      window.location.href = '/login';
+    } catch (error) {
+      console.error('Logout error:', error);
+      // Still redirect even if API call fails
+      window.location.href = '/login';
+    }
+  };
   
   // Load recent searches from localStorage
   useEffect(() => {
@@ -248,12 +262,22 @@ const Navigation: React.FC<NavigationProps> = ({
       setAnchorEl(null);
     }, 200);
   };
-  const navItems = [
+  // Desktop nav items - full navigation
+  const desktopNavItems = [
     { key: 'feed', label: 'Feed', icon: Home },
     { key: 'explore', label: 'Explore', icon: Explore },
     { key: 'videos', label: 'Reels', icon: VideoLibrary },
     { key: 'messages', label: 'Messages', icon: Message },
     { key: 'trending', label: 'Trending', icon: TrendingUp },
+    { key: 'profile', label: 'Profile', icon: Person }
+  ];
+
+  // Mobile nav items - essential navigation only
+  const mobileNavItems = [
+    { key: 'feed', label: 'Feed', icon: Home },
+    { key: 'videos', label: 'Reels', icon: VideoLibrary },
+    { key: 'explore', label: 'Explore', icon: Explore },
+    { key: 'messages', label: 'Messages', icon: Message },
     { key: 'profile', label: 'Profile', icon: Person }
   ];
 
@@ -292,7 +316,7 @@ const Navigation: React.FC<NavigationProps> = ({
                 fontWeight: 800,
                 mr: 4,
                 fontSize: { xs: '1.4rem', md: '1.8rem' },
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                background: 'linear-gradient(135deg, #1976d2 0%, #115293 100%)',
                 backgroundClip: 'text',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
@@ -332,14 +356,14 @@ const Navigation: React.FC<NavigationProps> = ({
                   transition: 'all 0.2s ease-in-out',
                   '&:hover': {
                     background: 'rgba(255, 255, 255, 1)',
-                    border: '1px solid rgba(102, 126, 234, 0.3)',
+                    border: '1px solid rgba(25, 118, 210, 0.3)',
                     transform: 'translateY(-1px)',
                     boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)'
                   },
                   '&.Mui-focused': {
                     background: 'rgba(255, 255, 255, 1)',
-                    border: '1px solid #667eea',
-                    boxShadow: '0 0 0 3px rgba(102, 126, 234, 0.1)'
+                    border: '1px solid #1976d2',
+                    boxShadow: '0 0 0 3px rgba(25, 118, 210, 0.1)'
                   }
                 },
                 '& .MuiOutlinedInput-input': {
@@ -349,7 +373,7 @@ const Navigation: React.FC<NavigationProps> = ({
                 }
               }}
               InputProps={{
-                startAdornment: <SearchIcon sx={{ color: '#667eea', mr: 1, ml: 1, fontSize: 20 }} />,
+                startAdornment: <SearchIcon sx={{ color: '#1976d2', mr: 1, ml: 1, fontSize: 20 }} />,
               }}
             />
             
@@ -358,20 +382,33 @@ const Navigation: React.FC<NavigationProps> = ({
               open={searchOpen && (searchResults.length > 0 || searchQuery.length > 0)}
               anchorEl={anchorEl}
               placement="bottom-start"
-              style={{ zIndex: 1300, width: anchorEl?.clientWidth }}
+              style={{ 
+                zIndex: 1400, 
+                width: anchorEl?.clientWidth,
+                marginTop: '8px'
+              }}
               transition
+              modifiers={[
+                {
+                  name: 'offset',
+                  options: {
+                    offset: [0, 8],
+                  },
+                },
+              ]}
             >
               {({ TransitionProps }) => (
                 <Fade {...TransitionProps} timeout={200}>
                   <Paper 
-                    elevation={8}
+                    elevation={12}
                     sx={{ 
-                      borderRadius: '12px',
+                      borderRadius: '16px',
                       overflow: 'hidden',
-                      mt: 1,
-                      maxHeight: '400px',
+                      maxHeight: '500px',
                       overflowY: 'auto',
-                      border: '1px solid rgba(0,0,0,0.1)'
+                      border: '1px solid rgba(0,0,0,0.1)',
+                      boxShadow: '0 8px 32px rgba(0,0,0,0.15)',
+                      background: 'white'
                     }}
                   >
                     <List sx={{ p: 0 }}>
@@ -401,7 +438,7 @@ const Navigation: React.FC<NavigationProps> = ({
                                     title: search,
                                     subtitle: 'Recent search'
                                   })}
-                                  sx={{ py: 1, '&:hover': { background: 'rgba(102, 126, 234, 0.05)' }, cursor: 'pointer' }}
+                                  sx={{ py: 1, '&:hover': { background: 'rgba(25, 118, 210, 0.05)' }, cursor: 'pointer' }}
                                 >
                                   <ListItemAvatar>
                                     <History color="action" />
@@ -435,7 +472,7 @@ const Navigation: React.FC<NavigationProps> = ({
                                     image: product.image,
                                     data: product
                                   })}
-                                  sx={{ py: 1, '&:hover': { background: 'rgba(102, 126, 234, 0.05)' }, cursor: 'pointer' }}
+                                  sx={{ py: 1, '&:hover': { background: 'rgba(25, 118, 210, 0.05)' }, cursor: 'pointer' }}
                                 >
                                   <ListItemAvatar>
                                     <Avatar src={product.image} sx={{ width: 32, height: 32 }} />
@@ -463,7 +500,7 @@ const Navigation: React.FC<NavigationProps> = ({
                           <ListItem 
                             key={result.id}
                             onClick={() => handleSearchClick(result)}
-                            sx={{ py: 1, '&:hover': { background: 'rgba(102, 126, 234, 0.05)' }, cursor: 'pointer' }}
+                            sx={{ py: 1, '&:hover': { background: 'rgba(25, 118, 210, 0.05)' }, cursor: 'pointer' }}
                           >
                             <ListItemAvatar>
                               {result.type === 'product' ? (
@@ -522,7 +559,7 @@ const Navigation: React.FC<NavigationProps> = ({
           
           {/* Desktop Navigation */}
           <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', gap: 1, mr: 3 }}>
-            {navItems.map(({ key, label, icon: Icon }) => (
+            {desktopNavItems.map(({ key, label, icon: Icon }) => (
               <Button
                 key={key}
                 onClick={() => onViewChange(key)}
@@ -531,12 +568,12 @@ const Navigation: React.FC<NavigationProps> = ({
                   borderRadius: '12px',
                   px: 2,
                   py: 1,
-                  color: currentView === key ? '#667eea' : '#64748b',
-                  background: currentView === key ? 'rgba(102, 126, 234, 0.1)' : 'transparent',
+                  color: currentView === key ? '#1976d2' : '#64748b',
+                  background: currentView === key ? 'rgba(25, 118, 210, 0.1)' : 'transparent',
                   fontWeight: currentView === key ? 600 : 500,
                   textTransform: 'none',
                   '&:hover': {
-                    background: currentView === key ? 'rgba(102, 126, 234, 0.15)' : 'rgba(100, 116, 139, 0.08)'
+                    background: currentView === key ? 'rgba(25, 118, 210, 0.15)' : 'rgba(100, 116, 139, 0.08)'
                   }
                 }}
               >
@@ -546,7 +583,7 @@ const Navigation: React.FC<NavigationProps> = ({
           </Box>
           
           {/* Action Icons */}
-          <Box display="flex" alignItems="center" gap={1}>
+          <Box display="flex" alignItems="center" gap={{ xs: 0.5, sm: 1 }}>
             {/* Create Button - Desktop */}
             <Button
               variant="contained"
@@ -555,14 +592,14 @@ const Navigation: React.FC<NavigationProps> = ({
               sx={{
                 display: { xs: 'none', sm: 'flex' },
                 borderRadius: '12px',
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                background: 'linear-gradient(135deg, #1976d2 0%, #115293 100%)',
                 px: 2,
                 py: 1,
                 fontWeight: 600,
                 textTransform: 'none',
-                boxShadow: '0 2px 8px rgba(102, 126, 234, 0.3)',
+                boxShadow: '0 2px 8px rgba(25, 118, 210, 0.3)',
                 '&:hover': {
-                  background: 'linear-gradient(135deg, #5a67d8 0%, #6b5b95 100%)',
+                  background: 'linear-gradient(135deg, #115293 0%, #0d3c6b 100%)',
                   transform: 'translateY(-1px)',
                   boxShadow: '0 4px 12px rgba(102, 126, 234, 0.4)'
                 }
@@ -576,6 +613,7 @@ const Navigation: React.FC<NavigationProps> = ({
               <IconButton 
                 onClick={onNotificationsOpen}
                 sx={{ 
+                  display: { xs: 'none', sm: 'inline-flex' },
                   background: 'rgba(255, 255, 255, 0.9)',
                   backdropFilter: 'blur(10px)',
                   border: '1px solid rgba(0, 0, 0, 0.05)',
@@ -602,11 +640,12 @@ const Navigation: React.FC<NavigationProps> = ({
               </IconButton>
             </motion.div>
             
-            {/* Theme Toggle */}
+            {/* Theme Toggle - Desktop only */}
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <IconButton 
                 onClick={toggleTheme}
                 sx={{ 
+                  display: { xs: 'none', sm: 'inline-flex' },
                   background: 'rgba(255, 255, 255, 0.9)',
                   backdropFilter: 'blur(10px)',
                   border: '1px solid rgba(0, 0, 0, 0.05)',
@@ -625,10 +664,11 @@ const Navigation: React.FC<NavigationProps> = ({
               </IconButton>
             </motion.div>
             
-            {/* Wishlist */}
+            {/* Wishlist - Desktop only */}
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <IconButton 
                 sx={{ 
+                  display: { xs: 'none', sm: 'inline-flex' },
                   background: 'rgba(255, 255, 255, 0.9)',
                   backdropFilter: 'blur(10px)',
                   border: '1px solid rgba(0, 0, 0, 0.05)',
@@ -655,58 +695,74 @@ const Navigation: React.FC<NavigationProps> = ({
               </IconButton>
             </motion.div>
             
-            {/* Cart */}
+            {/* Cart - Visible on both mobile and desktop */}
+            <IconButton 
+              onClick={onCartOpen}
+              sx={{ 
+                background: 'rgba(255, 255, 255, 0.9)',
+                backdropFilter: 'blur(10px)',
+                border: '1px solid rgba(0, 0, 0, 0.05)',
+                transition: 'all 0.2s ease',
+                '&:hover': {
+                  background: 'rgba(255, 255, 255, 1)',
+                  transform: 'translateY(-1px)',
+                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
+                }
+              }}
+            >
+              <Badge 
+                badgeContent={cartItemsCount} 
+                color="primary"
+                sx={{
+                  '& .MuiBadge-badge': {
+                    fontSize: '10px',
+                    height: '16px',
+                    minWidth: '16px'
+                  }
+                }}
+              >
+                <ShoppingCart sx={{ color: '#667eea', fontSize: { xs: 20, sm: 20 } }} />
+              </Badge>
+            </IconButton>
+            
+            {/* Profile Avatar - Desktop only */}
+            <Avatar 
+              src={currentUser?.avatar} 
+              onClick={() => onViewChange('profile')}
+              sx={{ 
+                display: { xs: 'none', sm: 'flex' },
+                width: 36, 
+                height: 36, 
+                cursor: 'pointer',
+                border: '2px solid rgba(102, 126, 234, 0.2)',
+                transition: 'all 0.2s ease-in-out',
+                '&:hover': {
+                  border: '2px solid #667eea',
+                  transform: 'translateY(-1px)',
+                  boxShadow: '0 4px 12px rgba(102, 126, 234, 0.3)'
+                }
+              }}
+            />
+            
+            {/* Logout Button - Desktop only */}
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <IconButton 
-                onClick={onCartOpen}
+                onClick={handleLogout}
                 sx={{ 
+                  display: { xs: 'none', sm: 'inline-flex' },
                   background: 'rgba(255, 255, 255, 0.9)',
                   backdropFilter: 'blur(10px)',
                   border: '1px solid rgba(0, 0, 0, 0.05)',
                   '&:hover': {
-                    background: 'rgba(255, 255, 255, 1)',
+                    background: 'rgba(239, 68, 68, 0.1)',
+                    borderColor: 'rgba(239, 68, 68, 0.3)',
                     transform: 'translateY(-1px)',
-                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
+                    boxShadow: '0 4px 12px rgba(239, 68, 68, 0.2)'
                   }
                 }}
               >
-                <Badge 
-                  badgeContent={cartItemsCount} 
-                  color="primary"
-                  sx={{
-                    '& .MuiBadge-badge': {
-                      fontSize: '10px',
-                      height: '16px',
-                      minWidth: '16px'
-                    }
-                  }}
-                >
-                  <ShoppingCart sx={{ color: '#667eea', fontSize: 20 }} />
-                </Badge>
+                <Logout sx={{ color: '#ef4444', fontSize: 20 }} />
               </IconButton>
-            </motion.div>
-            
-            {/* Profile Avatar */}
-            <motion.div 
-              whileHover={{ scale: 1.05 }} 
-              whileTap={{ scale: 0.95 }}
-            >
-              <Avatar 
-                src={currentUser?.avatar} 
-                onClick={() => onViewChange('profile')}
-                sx={{ 
-                  width: 36, 
-                  height: 36, 
-                  cursor: 'pointer',
-                  border: '2px solid rgba(102, 126, 234, 0.2)',
-                  transition: 'all 0.2s ease-in-out',
-                  '&:hover': {
-                    border: '2px solid #667eea',
-                    transform: 'translateY(-1px)',
-                    boxShadow: '0 4px 12px rgba(102, 126, 234, 0.3)'
-                  }
-                }}
-              />
             </motion.div>
           </Box>
         </Toolbar>
@@ -738,7 +794,7 @@ const Navigation: React.FC<NavigationProps> = ({
         />
       </Box>
       
-      {/* Mobile Bottom Navigation */}
+      {/* Mobile Bottom Navigation - Simplified */}
       <Box sx={{ 
         position: 'fixed',
         bottom: 0,
@@ -750,10 +806,13 @@ const Navigation: React.FC<NavigationProps> = ({
         display: { xs: 'flex', md: 'none' },
         justifyContent: 'space-around',
         alignItems: 'center',
-        py: 1,
-        zIndex: 1000
+        py: 1.5,
+        px: 2,
+        zIndex: 1000,
+        boxShadow: '0 -2px 10px rgba(0,0,0,0.05)'
       }}>
-        {navItems.slice(0, 2).map(({ key, icon: Icon }) => (
+        {/* Essential Navigation Icons */}
+        {mobileNavItems.map(({ key, icon: Icon }) => (
           <IconButton
             key={key}
             onClick={() => onViewChange(key)}
@@ -761,58 +820,14 @@ const Navigation: React.FC<NavigationProps> = ({
               color: currentView === key ? '#667eea' : '#64748b',
               background: currentView === key ? 'rgba(102, 126, 234, 0.1)' : 'transparent',
               borderRadius: '12px',
-              p: 1.5,
+              p: 1.2,
+              transition: 'all 0.2s ease',
               '&:hover': {
                 background: currentView === key ? 'rgba(102, 126, 234, 0.15)' : 'rgba(100, 116, 139, 0.08)'
               }
             }}
           >
-            <Icon />
-          </IconButton>
-        ))}
-        
-        {/* Mobile Cart Icon */}
-        <IconButton
-          onClick={onCartOpen}
-          sx={{
-            color: '#667eea',
-            borderRadius: '12px',
-            p: 1.5,
-            '&:hover': {
-              background: 'rgba(102, 126, 234, 0.08)'
-            }
-          }}
-        >
-          <Badge 
-            badgeContent={cartItemsCount} 
-            color="primary"
-            sx={{
-              '& .MuiBadge-badge': {
-                fontSize: '9px',
-                height: '14px',
-                minWidth: '14px'
-              }
-            }}
-          >
-            <ShoppingCart />
-          </Badge>
-        </IconButton>
-        
-        {navItems.slice(2).map(({ key, icon: Icon }) => (
-          <IconButton
-            key={key}
-            onClick={() => onViewChange(key)}
-            sx={{
-              color: currentView === key ? '#667eea' : '#64748b',
-              background: currentView === key ? 'rgba(102, 126, 234, 0.1)' : 'transparent',
-              borderRadius: '12px',
-              p: 1.5,
-              '&:hover': {
-                background: currentView === key ? 'rgba(102, 126, 234, 0.15)' : 'rgba(100, 116, 139, 0.08)'
-              }
-            }}
-          >
-            <Icon />
+            <Icon fontSize="medium" />
           </IconButton>
         ))}
         
@@ -822,13 +837,15 @@ const Navigation: React.FC<NavigationProps> = ({
           sx={{
             background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
             color: 'white',
+            p: 1.2,
+            transition: 'all 0.2s ease',
             '&:hover': {
               background: 'linear-gradient(135deg, #5a67d8 0%, #6b5b95 100%)',
               transform: 'scale(1.05)'
             }
           }}
         >
-          <Add />
+          <Add fontSize="medium" />
         </IconButton>
       </Box>
     </>

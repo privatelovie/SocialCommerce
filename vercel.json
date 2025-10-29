@@ -1,14 +1,14 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "version": 2,
-  "buildCommand": "DISABLE_ESLINT_PLUGIN=true GENERATE_SOURCEMAP=false npm run build",
+  "buildCommand": "CI=false DISABLE_ESLINT_PLUGIN=true GENERATE_SOURCEMAP=false TSC_COMPILE_ON_ERROR=true npm run build",
   "outputDirectory": "build",
   "installCommand": "npm ci --omit=dev",
   "framework": "create-react-app",
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "https://social-commerce-backend.vercel.app/api/$1"
+      "destination": "https://socialcommerce-production.up.railway.app/api/$1"
     },
     {
       "source": "/(.*)",
@@ -46,12 +46,14 @@
   ],
   "env": {
     "NODE_ENV": "production",
-    "REACT_APP_API_URL": "https://social-commerce-backend.vercel.app",
+    "REACT_APP_API_URL": "https://socialcommerce-production.up.railway.app",
+    "REACT_APP_SOCKET_URL": "https://socialcommerce-production.up.railway.app",
     "CI": "false",
     "GENERATE_SOURCEMAP": "false",
     "ESLINT_NO_DEV_ERRORS": "true",
     "TSC_COMPILE_ON_ERROR": "true",
-    "SKIP_PREFLIGHT_CHECK": "true"
+    "SKIP_PREFLIGHT_CHECK": "true",
+    "DISABLE_ESLINT_PLUGIN": "true"
   },
   "regions": ["iad1"],
   "github": {

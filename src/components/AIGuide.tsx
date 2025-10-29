@@ -281,18 +281,24 @@ const AIGuide: React.FC<AIGuideProps> = ({ onNavigate, onSearch, onProductRecomm
 
   return (
     <>
-      {/* AI Guide FAB */}
+      {/* AI Guide FAB - Positioned above mobile nav on small screens */}
       <Fab
         color="primary"
         sx={{
           position: 'fixed',
-          bottom: 24,
-          right: 24,
+          bottom: { xs: 80, md: 24 },
+          right: { xs: 16, md: 24 },
           background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          boxShadow: '0 4px 16px rgba(102, 126, 234, 0.4)',
+          width: { xs: 52, md: 56 },
+          height: { xs: 52, md: 56 },
           '&:hover': {
             background: 'linear-gradient(135deg, #764ba2 0%, #667eea 100%)',
+            transform: 'scale(1.05)',
+            boxShadow: '0 6px 20px rgba(102, 126, 234, 0.5)',
           },
-          zIndex: 1000,
+          transition: 'all 0.2s ease',
+          zIndex: 999,
         }}
         onClick={() => setIsOpen(true)}
       >
@@ -308,11 +314,11 @@ const AIGuide: React.FC<AIGuideProps> = ({ onNavigate, onSearch, onProductRecomm
             exit={{ opacity: 0, scale: 0.8, y: 50 }}
             style={{
               position: 'fixed',
-              bottom: 100,
-              right: 24,
+              bottom: window.innerWidth < 768 ? 140 : 100,
+              right: window.innerWidth < 768 ? 16 : 24,
               zIndex: 1001,
-              width: 360,
-              maxWidth: 'calc(100vw - 48px)',
+              width: window.innerWidth < 768 ? 'calc(100vw - 32px)' : 360,
+              maxWidth: 'calc(100vw - 32px)',
             }}
           >
             <Paper
